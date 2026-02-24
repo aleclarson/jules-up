@@ -1,68 +1,68 @@
-import { load } from "@tauri-apps/plugin-store";
-
-export interface SessionState {
-  sessionId: string;
-  status: 'active' | 'paused' | 'archived';
-  taskId: string;
-}
-
-export type SpaceRepoMappings = Record<string, string>;
-export type ActiveSessions = Record<string, SessionState>;
+import { load, Store } from "@tauri-apps/plugin-store";
+import { SpaceRepoMapping, ActiveJulesSessions, JulesSession } from "../types";
 
 const STORE_FILENAME = "app_settings.json";
 
-export class StoreWrapper {
-  private storePromise: ReturnType<typeof load>;
+export class StoreService {
+  private storePromise: Promise<Store>;
 
   constructor() {
     this.storePromise = load(STORE_FILENAME, { autoSave: true, defaults: {} });
   }
 
-  async getClickUpPAT(): Promise<string> {
+  async getClickUpPat(): Promise<string | null> {
     const store = await this.storePromise;
-    return (await store.get<string>("clickup_pat")) || "";
+    return (await store.get<string>("clickup_pat")) || null;
   }
 
-  async setClickUpPAT(pat: string): Promise<void> {
+  async setClickUpPat(pat: string): Promise<void> {
     const store = await this.storePromise;
     await store.set("clickup_pat", pat);
+    await store.save();
   }
 
-  async getJulesAPIKey(): Promise<string> {
+  async getJulesApiKey(): Promise<string | null> {
     const store = await this.storePromise;
-    return (await store.get<string>("jules_api_key")) || "";
+    return (await store.get<string>("jules_api_key")) || null;
   }
 
-  async setJulesAPIKey(key: string): Promise<void> {
+  async setJulesApiKey(apiKey: string): Promise<void> {
     const store = await this.storePromise;
-    await store.set("jules_api_key", key);
+    await store.set("jules_api_key", apiKey);
+    await store.save();
   }
 
-  async getSpaceRepoMappings(): Promise<SpaceRepoMappings> {
+  async getSpaceRepoMappings(): Promise<SpaceRepoMapping> {
     const store = await this.storePromise;
-    return (await store.get<SpaceRepoMappings>("space_repo_mappings")) || {};
+    return (await store.get<SpaceRepoMapping>("space_repo_mappings")) || {};
   }
 
-  async setSpaceRepoMappings(mappings: SpaceRepoMappings): Promise<void> {
+  async setSpaceRepoMappings(mappings: SpaceRepoMapping): Promise<void> {
     const store = await this.storePromise;
     await store.set("space_repo_mappings", mappings);
+    await store.save();
   }
 
-  async getActiveJulesSessions(): Promise<ActiveSessions> {
+  async getActiveJulesSessions(): Promise<ActiveJulesSessions> {
     const store = await this.storePromise;
-    return (await store.get<ActiveSessions>("active_jules_sessions")) || {};
+    return (await store.get<ActiveJulesSessions>("active_jules_sessions")) || {};
   }
 
-  async setActiveJulesSessions(sessions: ActiveSessions): Promise<void> {
+  async setActiveJulesSessions(sessions: ActiveJulesSessions): Promise<void> {
     const store = await this.storePromise;
     await store.set("active_jules_sessions", sessions);
+    await store.save();
   }
 
-  // Generic methods for backward compatibility if needed by others
+  async getSession(taskId: string): Promise<JulesSession | null> {
+      const sessions = await this.getActiveJulesSessions();
+      return sessions[taskId] || null;
+  }
+
   async get<T>(key: string): Promise<T | null> {
     const store = await this.storePromise;
-    const value = await store.get<T>(key);
-    return value ?? null;
+    const val = await store.get<T>(key);
+    return val ?? null;
   }
 
   async set(key: string, value: any): Promise<void> {
@@ -76,4 +76,4 @@ export class StoreWrapper {
   }
 }
 
-export const store = new StoreWrapper();
+export const storeService = new StoreService();

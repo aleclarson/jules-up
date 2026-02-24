@@ -1,83 +1,64 @@
 import { useEffect, useState } from "preact/hooks";
+import { Activity } from "../types";
+import { julesService } from "../services/jules";
+import { gitService } from "../services/git";
 import { activeSession, repoMappings, selectedSpaceId } from "../state";
-import { listActivities } from "../services/jules";
-import { checkoutBranch } from "../services/git";
+import styles from "./SessionControls.module.css";
 
 export function SessionControls() {
-  const [prReady, setPrReady] = useState(false);
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
-    if (!activeSession.value) return;
-
-    const interval = setInterval(async () => {
-      const newActivities = await listActivities(activeSession.value!.sessionId);
-      setActivities(newActivities);
-
-      // Check if PR is ready (mock logic)
-      if (newActivities.some(a => a.type === 'pr_created')) {
-        setPrReady(true);
+    const fetchActivities = async () => {
+      if (activeSession.value) {
+        const newActivities = await julesService.listActivities(activeSession.value.sessionId);
+        setActivities(newActivities);
       }
-    }, 5000); // Poll every 5 seconds
+    };
 
+    fetchActivities();
+    const interval = setInterval(fetchActivities, 5000);
     return () => clearInterval(interval);
   }, [activeSession.value]);
 
   if (!activeSession.value) return null;
 
-  const handlePauseResume = () => {
-    // Toggle status locally for now
-    activeSession.value = {
-      ...activeSession.value!,
-      status: activeSession.value!.status === 'active' ? 'paused' : 'active'
-    };
+  const handleApprove = async () => {
+    await julesService.approvePlan(activeSession.value!.sessionId);
+  };
+
+  const handleCheckout = async () => {
+    const spaceId = selectedSpaceId.value;
+    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
+    if (repoPath) {
+      await gitService.checkoutBranch(repoPath, "jules-branch");
+      alert("Checked out branch: jules-branch");
+    }
   };
 
   const handleArchive = () => {
-    // Stops the agent, clears the local session state, and removes the Jules controls
     activeSession.value = null;
   };
 
-  const handleCheckoutPR = async () => {
-    const spaceId = selectedSpaceId.value;
-    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
-
-    if (!repoPath) {
-      console.error("No repo path found for selected space.");
-      return;
-    }
-
-    await checkoutBranch(repoPath, "jules-branch");
-    console.log("Checked out PR branch");
-  };
-
   return (
-    <div style={{
-      position: "fixed",
-      bottom: "20px",
-      right: "20px",
-      backgroundColor: "white",
-      padding: "15px",
-      borderRadius: "8px",
-      boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-      width: "300px",
-    }}>
-      <h3>Active Session</h3>
-      <p>Task ID: {activeSession.value.taskId}</p>
+    <div className={styles.container}>
+      <h3>Active Jules Session: {activeSession.value.taskId}</h3>
       <p>Status: {activeSession.value.status}</p>
-      <div style={{ maxHeight: "100px", overflowY: "auto", marginBottom: "10px", fontSize: "12px" }}>
+
+      <div className={styles.activitiesContainer}>
+        <h4>Activities</h4>
+        {activities.length === 0 && <p>Waiting for Jules...</p>}
         {activities.map((a, i) => (
-          <div key={i}>{a.type}: {a.payload}</div>
+          <div key={i} className={styles.activityLine}>
+            [{new Date(a.timestamp).toLocaleTimeString()}] {a.type}: {JSON.stringify(a.details)}
+          </div>
         ))}
       </div>
-      <div style={{ display: "flex", gap: "5px" }}>
-        <button onClick={handlePauseResume}>
-          {activeSession.value.status === 'active' ? 'Pause' : 'Resume'}
-        </button>
-        <button onClick={handleArchive}>Archive</button>
-        <button onClick={handleCheckoutPR} disabled={!prReady}>
-          Checkout PR
-        </button>
+
+      <div className={styles.actions}>
+        <button onClick={handleApprove}>Approve Plan</button>
+        <button onClick={handleCheckout}>Checkout PR Branch</button>
+        <button onClick={handleArchive}>Archive Session</button>
       </div>
     </div>
   );
