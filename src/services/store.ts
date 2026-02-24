@@ -59,7 +59,6 @@ export class StoreService {
       return sessions[taskId] || null;
   }
 
-  // Aliases and generic methods for Charlie's UI compatibility
   async get<T>(key: string): Promise<T | null> {
     const store = await this.storePromise;
     const val = await store.get<T>(key);
@@ -75,18 +74,6 @@ export class StoreService {
     const store = await this.storePromise;
     await store.save();
   }
-
-  getClickUpPAT = () => this.getClickUpPat();
-  setClickUpPAT = (pat: string) => this.setClickUpPat(pat);
-  getJulesAPIKey = () => this.getJulesApiKey();
-  setJulesAPIKey = (key: string) => this.setJulesApiKey(key);
 }
 
 export const storeService = new StoreService();
-
-// For compatibility with Charlie's "import { store } from './services/store'"
-export const store = storeService;
-
-// For compatibility with src/state.ts
-export type SessionState = JulesSession;
-export type { SpaceRepoMapping as SpaceRepoMappings, ActiveJulesSessions as ActiveSessions };

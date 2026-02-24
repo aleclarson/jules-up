@@ -1,7 +1,8 @@
 import { useState } from "preact/hooks";
-import { Task } from "../services/clickup";
-import { createSession } from "../services/jules";
+import { Task } from "../types";
+import { julesService } from "../services/jules";
 import { activeSession, repoMappings, selectedSpaceId } from "../state";
+import styles from "./JulesPromptModal.module.css";
 
 interface JulesPromptModalProps {
   task: Task;
@@ -21,7 +22,7 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
     }
 
     // 1. Create session
-    const session = await createSession(prompt, { taskId: task.id, repoPath });
+    const session = await julesService.createSession(prompt, { taskId: task.id, repoPath });
 
     // 2. Update active session state
     activeSession.value = {
@@ -35,32 +36,17 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
   };
 
   return (
-    <div style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}>
-      <div style={{
-        backgroundColor: "white",
-        padding: "20px",
-        borderRadius: "8px",
-        width: "500px",
-      }}>
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
         <h2>Delegate Task to Jules</h2>
         <p>Task: {task.name}</p>
         <textarea
-          style={{ width: "100%", height: "150px" }}
+          className={styles.textarea}
           value={prompt}
           onInput={(e) => setPrompt((e.target as HTMLTextAreaElement).value)}
         />
-        <div style={{ marginTop: "10px", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ marginRight: "10px" }}>Cancel</button>
+        <div className={styles.actions}>
+          <button onClick={onClose} className={styles.cancelButton}>Cancel</button>
           <button onClick={handleDelegate}>Delegate</button>
         </div>
       </div>

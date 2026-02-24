@@ -37,7 +37,3 @@ export class GitService {
 }
 
 export const gitService = new GitService();
-
-// Exported functions for UI compatibility
-export const selectRepoDirectory = () => gitService.selectRepoDirectory();
-export const checkoutBranch = (repoPath: string, branchName: string) => gitService.checkoutBranch(repoPath, branchName);

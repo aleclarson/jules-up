@@ -1,33 +1,32 @@
 import { useEffect } from "preact/hooks";
-import { getLists } from "../services/clickup";
-import { lists, currentView, selectedSpaceId, selectedListId } from "../state";
+import { List } from "../types";
+import { clickupService } from "../services/clickup";
+import { lists, selectedSpaceId, selectedListId, currentView } from "../state";
 
 export function ListsView() {
   useEffect(() => {
-    async function fetchLists() {
+    const fetchLists = async () => {
       if (selectedSpaceId.value) {
-        lists.value = await getLists(selectedSpaceId.value);
+        lists.value = await clickupService.getLists(selectedSpaceId.value);
       }
-    }
+    };
     fetchLists();
   }, [selectedSpaceId.value]);
 
-  const handleListClick = (listId: string) => {
-    selectedListId.value = listId;
+  const selectList = (id: string) => {
+    selectedListId.value = id;
     currentView.value = "tasks";
-    console.log(`Navigating to tasks for list ${listId}`);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Lists</h2>
+    <div>
       <button onClick={() => currentView.value = "spaces"}>Back to Spaces</button>
+      <h2>Lists</h2>
       <ul>
-        {lists.value.map((list) => (
-          <li key={list.id} style={{ marginBottom: "10px", padding: "10px", border: "1px solid #ccc" }}>
-            <div onClick={() => handleListClick(list.id)} style={{ cursor: "pointer", fontWeight: "bold" }}>
-              {list.name}
-            </div>
+        {lists.value.map((list: List) => (
+          <li key={list.id}>
+            {list.name}
+            <button onClick={() => selectList(list.id)}>Select</button>
           </li>
         ))}
       </ul>

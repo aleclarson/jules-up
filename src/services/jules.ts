@@ -56,9 +56,3 @@ export class JulesService {
 }
 
 export const julesService = new JulesService();
-
-// Exported functions for UI compatibility
-export const createSession = (prompt: string, sourceContext: any) => julesService.createSession(prompt, sourceContext);
-export const sendMessage = (sessionId: string, message: string) => julesService.sendMessage(sessionId, message);
-export const listActivities = (sessionId: string) => julesService.listActivities(sessionId);
-export const approvePlan = (sessionId: string) => julesService.approvePlan(sessionId);

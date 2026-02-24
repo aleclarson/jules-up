@@ -1,0 +1,11 @@
+.taskItem {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  list-style: none;
+}
+
+.workingLabel {
+  color: green;
+  font-weight: bold;
+}

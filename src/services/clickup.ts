@@ -1,7 +1,6 @@
 import { fetch } from "@tauri-apps/plugin-http";
 import { storeService } from "./store";
 import { Space, List, Task, User } from "../types";
-export type { Space, List, Task, User };
 
 const API_BASE = "https://api.clickup.com/api/v2";
 
@@ -116,9 +115,3 @@ export class ClickUpService {
 }
 
 export const clickupService = new ClickUpService();
-
-// Exported functions for UI compatibility
-export const getSpaces = () => clickupService.getSpaces();
-export const getLists = (spaceId: string) => clickupService.getLists(spaceId);
-export const getTasks = (listId: string) => clickupService.getTasks(listId);
-export const delegateTask = (taskId: string, userId: string) => clickupService.delegateTask(taskId, userId);

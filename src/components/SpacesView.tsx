@@ -1,48 +1,49 @@
 import { useEffect } from "preact/hooks";
-import { getSpaces } from "../services/clickup";
-import { selectRepoDirectory } from "../services/git";
-import { spaces, repoMappings, currentView, selectedSpaceId } from "../state";
-import { store } from "../services/store";
+import { Space } from "../types";
+import { clickupService } from "../services/clickup";
+import { gitService } from "../services/git";
+import { storeService } from "../services/store";
+import { spaces, selectedSpaceId, currentView, repoMappings } from "../state";
+import styles from "./SpacesView.module.css";
 
 export function SpacesView() {
   useEffect(() => {
-    async function fetchSpaces() {
-      spaces.value = await getSpaces();
-    }
+    const fetchSpaces = async () => {
+      spaces.value = await clickupService.getSpaces();
+    };
     fetchSpaces();
   }, []);
 
-  const handleSelectRepo = async (spaceId: string) => {
-    const repoPath = await selectRepoDirectory();
+  const handleMapRepo = async (spaceId: string) => {
+    const repoPath = await gitService.selectRepoDirectory();
     if (repoPath) {
       repoMappings.value = { ...repoMappings.value, [spaceId]: repoPath };
-      await store.setSpaceRepoMappings(repoMappings.value);
-      await store.save();
+      await storeService.setSpaceRepoMappings(repoMappings.value);
+      await storeService.save();
     }
   };
 
-  const handleSpaceClick = (spaceId: string) => {
-    selectedSpaceId.value = spaceId;
+  const selectSpace = (id: string) => {
+    selectedSpaceId.value = id;
     currentView.value = "lists";
-    console.log(`Navigating to lists for space ${spaceId}`);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h2>Spaces</h2>
-      <button onClick={() => currentView.value = "settings"}>Back to Settings</button>
       <ul>
-        {spaces.value.map((space) => (
-          <li key={space.id} style={{ marginBottom: "10px", padding: "10px", border: "1px solid #ccc" }}>
-            <div onClick={() => handleSpaceClick(space.id)} style={{ cursor: "pointer", fontWeight: "bold" }}>
-              {space.name}
-            </div>
-            <div>
-              Mapped Repo: {repoMappings.value[space.id] || "None"}
-              <button onClick={() => handleSelectRepo(space.id)} style={{ marginLeft: "10px" }}>
-                Select Repo
-              </button>
-            </div>
+        {spaces.value.map((space: Space) => (
+          <li key={space.id} className={styles.spaceItem}>
+            <strong>{space.name}</strong>
+            <button className={styles.actionButton} onClick={() => selectSpace(space.id)}>Select</button>
+            <button className={styles.actionButton} onClick={() => handleMapRepo(space.id)}>
+              {repoMappings.value[space.id] ? "Update Repo" : "Map Repo"}
+            </button>
+            {repoMappings.value[space.id] && (
+              <span className={styles.mappedRepoLabel}>
+                Mapped to: {repoMappings.value[space.id]}
+              </span>
+            )}
           </li>
         ))}
       </ul>

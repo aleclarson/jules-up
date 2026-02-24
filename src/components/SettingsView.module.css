@@ -1,0 +1,15 @@
+.container {
+  padding: 20px;
+}
+
+.field {
+  margin-bottom: 15px;
+}
+
+.label {
+  display: block;
+}
+
+.input {
+  width: 300px;
+}

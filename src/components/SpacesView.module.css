@@ -1,0 +1,14 @@
+.mappedRepoLabel {
+  margin-left: 10px;
+  color: gray;
+  font-size: 0.9em;
+}
+
+.spaceItem {
+  margin-bottom: 8px;
+  list-style: none;
+}
+
+.actionButton {
+  margin-left: 8px;
+}
