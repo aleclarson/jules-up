@@ -10,9 +10,9 @@ This is a **Tauri 2.0** desktop application using a **Frontend-Heavy** architect
 1.  **Source of Truth**: Always refer to `@spec.md` for behavior and `@plan.md` for implementation details.
 2.  **No Rust**: Do not modify Rust code unless absolutely necessary for configuration. Logic should reside in TypeScript.
 3.  **Tauri Plugins**: Use the official plugins (`@tauri-apps/plugin-*`) as specified in the plan.
-    - HTTP: `plugin-http` (for ClickUp API)
+    - HTTP: `plugin-http` (for ClickUp and Jules APIs)
     - Store: `plugin-store` (for persistence)
-    - Shell: `plugin-shell` (for Git/Jules commands)
+    - Shell: `plugin-shell` (for Git commands)
     - Dialog: `plugin-dialog` (for file selection)
 4.  **Verification**: After creating files or modifying code, verify the changes using `read_file` or `list_files`.
 5.  **State Management**: Use Preact Signals to manage UI state, but ensure data is persisted to the Tauri Store.
