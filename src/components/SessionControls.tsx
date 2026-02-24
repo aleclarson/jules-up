@@ -43,22 +43,23 @@ export function SessionControls() {
   return (
     <div className={styles.container}>
       <h3>Active Jules Session: {activeSession.value.taskId}</h3>
-      <p>Status: {activeSession.value.status}</p>
+      <div className={styles.status}>Status: {activeSession.value.status}</div>
 
       <div className={styles.activitiesContainer}>
-        <h4>Activities</h4>
-        {activities.length === 0 && <p>Waiting for Jules...</p>}
+        <div className={styles.activitiesHeader}>Latest Activities</div>
+        {activities.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>Waiting for Jules...</p>}
         {activities.map((a, i) => (
           <div key={i} className={styles.activityLine}>
-            [{new Date(a.timestamp).toLocaleTimeString()}] {a.type}: {JSON.stringify(a.details)}
+            <span className={styles.timestamp}>[{new Date(a.timestamp).toLocaleTimeString()}]</span> 
+            <strong>{a.type}</strong>: {typeof a.details === 'string' ? a.details : JSON.stringify(a.details)}
           </div>
         ))}
       </div>
 
       <div className={styles.actions}>
-        <button onClick={handleApprove}>Approve Plan</button>
-        <button onClick={handleCheckout}>Checkout PR Branch</button>
-        <button onClick={handleArchive}>Archive Session</button>
+        <button className={styles.approveButton} onClick={handleApprove}>Approve Plan</button>
+        <button className={styles.checkoutButton} onClick={handleCheckout}>Checkout PR Branch</button>
+        <button className={styles.archiveButton} onClick={handleArchive}>Archive Session</button>
       </div>
     </div>
   );

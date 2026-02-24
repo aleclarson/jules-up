@@ -39,15 +39,16 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <h2>Delegate Task to Jules</h2>
-        <p>Task: {task.name}</p>
+        <div className={styles.taskName}>Task: {task.name}</div>
         <textarea
           className={styles.textarea}
           value={prompt}
+          placeholder="Describe the objective for Jules..."
           onInput={(e) => setPrompt((e.target as HTMLTextAreaElement).value)}
         />
         <div className={styles.actions}>
           <button onClick={onClose} className={styles.cancelButton}>Cancel</button>
-          <button onClick={handleDelegate}>Delegate</button>
+          <button onClick={handleDelegate} className={styles.delegateButton}>Delegate</button>
         </div>
       </div>
     </div>
