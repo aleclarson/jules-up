@@ -2,8 +2,8 @@
 
 ## Repository Context
 This is a **Tauri 2.0** desktop application using a **Frontend-Heavy** architecture.
-- **Framework**: React + TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
+- **Framework**: Preact + TypeScript
+- **Styling**: CSS Modules
 - **Backend**: No custom Rust code. Use Tauri plugins for OS interaction.
 
 ## Development Rules
@@ -15,10 +15,10 @@ This is a **Tauri 2.0** desktop application using a **Frontend-Heavy** architect
     - Shell: `plugin-shell` (for Git/Jules commands)
     - Dialog: `plugin-dialog` (for file selection)
 4.  **Verification**: After creating files or modifying code, verify the changes using `read_file` or `list_files`.
-5.  **State Management**: Use Zustand or Context to manage UI state, but ensure data is persisted to the Tauri Store.
+5.  **State Management**: Use Preact Signals to manage UI state, but ensure data is persisted to the Tauri Store.
 
 ## File Structure
-- `src/`: Frontend React code
+- `src/`: Frontend Preact code
 - `src/services/`: TypeScript services for integrations (ClickUp, Git, Jules, Store)
 - `src-tauri/`: Tauri configuration (Rust host)
 

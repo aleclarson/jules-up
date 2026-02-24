@@ -3,7 +3,7 @@
 ## 1. Technology Stack
 
 - **Framework**: Tauri 2.0
-- **Frontend logic & UI**: React, TypeScript, Tailwind CSS, shadcn/ui.
+- **Frontend logic & UI**: Preact, TypeScript, CSS Modules.
 - **ClickUp APIs**: `@tauri-apps/plugin-http` (provides a drop-in replacement for standard `fetch()` that executes natively to bypass browser CORS restrictions).
 - **Local Storage**: `@tauri-apps/plugin-store` (for JS-driven JSON persistence).
 - **Git & System Execution**: `@tauri-apps/plugin-shell` (to execute local `git` commands directly from TypeScript).
@@ -12,16 +12,16 @@
 
 ## 2. Architecture Overview
 
-We will use a "Thick Client / Frontend-Heavy" architecture. React/TypeScript will orchestrate the entire workflow. Instead of writing custom Rust bindings via Tauri Commands (`invoke`), the frontend will use Tauri's official JS APIs to interact with the OS.
+We will use a "Thick Client / Frontend-Heavy" architecture. Preact/TypeScript will orchestrate the entire workflow. Instead of writing custom Rust bindings via Tauri Commands (`invoke`), the frontend will use Tauri's official JS APIs to interact with the OS.
 
-- **Data layer**: Managed via Zustand or React Context.
+- **Data layer**: Managed via Preact Signals.
 - **Service layer**: Plain TypeScript classes/functions utilizing Tauri plugins.
 
 ## 3. Phase-by-Phase Implementation
 
 ### Phase 1: Project Setup & Tauri Configuration
 
-1.  **Initialize**: Run `create-tauri-app` (React + TypeScript).
+1.  **Initialize**: Run `create-tauri-app` (Preact + TypeScript).
 2.  **Install Tauri Plugins**:
     ```bash
     npm install @tauri-apps/plugin-store @tauri-apps/plugin-http @tauri-apps/plugin-shell @tauri-apps/plugin-dialog
@@ -100,7 +100,7 @@ Create `src/services/jules.ts`.
 
 ### Phase 6: Frontend UI Construction
 
-1.  **State Management**: Create a custom React hook (e.g., `useAppStore()`) that listens to the Tauri Store and hydrates React state.
+1.  **State Management**: Create a central store using Preact Signals to listen to the Tauri Store and manage application state.
 2.  **Views**:
     - **Settings View**: Rendered if `clickup_pat` is missing. Input field saves to Store.
     - **Spaces View**: Lists spaces. Uses an "add folder" icon to trigger the `open()` dialog and map the returned path to the Space ID in the Store.
