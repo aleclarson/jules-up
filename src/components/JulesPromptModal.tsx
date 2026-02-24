@@ -25,9 +25,10 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
 
     // 2. Update active session state
     activeSession.value = {
-      sessionId: session.id,
+      sessionId: session.sessionId,
       status: "active",
       taskId: task.id,
+      repoPath: repoPath as string,
     };
 
     onClose();

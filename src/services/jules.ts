@@ -1,30 +1,64 @@
-export interface Session {
-  id: string;
-  status: string;
+import { fetch } from "@tauri-apps/plugin-http";
+import { storeService } from "./store";
+import { JulesSession, Activity } from "../types";
+
+const API_BASE = "https://jules.googleapis.com/v1alpha";
+
+export class JulesService {
+  private async getHeaders(): Promise<HeadersInit> {
+    const apiKey = await storeService.getJulesApiKey();
+    if (!apiKey) throw new Error("Jules API Key not configured");
+    return {
+      "x-goog-api-key": apiKey,
+      "Content-Type": "application/json",
+    };
+  }
+
+  async createSession(prompt: string, sourceContext: any): Promise<JulesSession> {
+    const response = await fetch(`${API_BASE}/sessions`, {
+      method: "POST",
+      headers: await this.getHeaders(),
+      body: JSON.stringify({
+        prompt,
+        sourceContext,
+      }),
+    });
+    if (!response.ok) throw new Error(`Failed to create session: ${response.statusText}`);
+    return await response.json();
+  }
+
+  async sendMessage(sessionId: string, message: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/sessions/${sessionId}:sendMessage`, {
+      method: "POST",
+      headers: await this.getHeaders(),
+      body: JSON.stringify({ message }),
+    });
+    if (!response.ok) throw new Error(`Failed to send message: ${response.statusText}`);
+  }
+
+  async listActivities(sessionId: string): Promise<Activity[]> {
+    const response = await fetch(`${API_BASE}/sessions/${sessionId}/activities`, {
+      method: "GET",
+      headers: await this.getHeaders(),
+    });
+    if (!response.ok) throw new Error(`Failed to list activities: ${response.statusText}`);
+    const data = await response.json();
+    return data.activities;
+  }
+
+  async approvePlan(sessionId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/sessions/${sessionId}:approvePlan`, {
+      method: "POST",
+      headers: await this.getHeaders(),
+    });
+    if (!response.ok) throw new Error(`Failed to approve plan: ${response.statusText}`);
+  }
 }
 
-export interface Activity {
-  type: string;
-  payload: any;
-}
+export const julesService = new JulesService();
 
-export async function createSession(prompt: string, _sourceContext: any): Promise<Session> {
-  console.log('[Mock Jules] Creating session with prompt:', prompt);
-  return { id: 'session-123', status: 'created' };
-}
-
-export async function sendMessage(sessionId: string, message: string): Promise<void> {
-  console.log(`[Mock Jules] Sending message to session ${sessionId}: ${message}`);
-}
-
-export async function listActivities(sessionId: string): Promise<Activity[]> {
-  console.log(`[Mock Jules] Listing activities for session ${sessionId}`);
-  return [
-    { type: 'message', payload: 'Analyzing request...' },
-    { type: 'plan', payload: 'Plan proposed.' },
-  ];
-}
-
-export async function approvePlan(sessionId: string): Promise<void> {
-  console.log(`[Mock Jules] Approving plan for session ${sessionId}`);
-}
+// Exported functions for UI compatibility
+export const createSession = (prompt: string, sourceContext: any) => julesService.createSession(prompt, sourceContext);
+export const sendMessage = (sessionId: string, message: string) => julesService.sendMessage(sessionId, message);
+export const listActivities = (sessionId: string) => julesService.listActivities(sessionId);
+export const approvePlan = (sessionId: string) => julesService.approvePlan(sessionId);
