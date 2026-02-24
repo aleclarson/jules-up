@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { Task } from "../services/clickup";
 import { createSession } from "../services/jules";
-import { activeSession } from "../state";
+import { activeSession, repoMappings, selectedSpaceId } from "../state";
 
 interface JulesPromptModalProps {
   task: Task;
@@ -12,8 +12,16 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
   const [prompt, setPrompt] = useState(task.description);
 
   const handleDelegate = async () => {
+    const spaceId = selectedSpaceId.value;
+    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
+
+    if (!repoPath) {
+      alert("No repository mapped for this space. Please map a repo in the Spaces view first.");
+      return;
+    }
+
     // 1. Create session
-    const session = await createSession(prompt, { taskId: task.id, repoPath: "/mock/repo/path" });
+    const session = await createSession(prompt, { taskId: task.id, repoPath });
 
     // 2. Update active session state
     activeSession.value = {

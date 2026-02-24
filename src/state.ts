@@ -1,12 +1,18 @@
 import { signal } from "@preact/signals";
-import { Space, Task } from "./services/clickup";
+import { Space, Task, List } from "./services/clickup";
 import { SessionState } from "./services/store";
 
-export type View = "settings" | "spaces" | "tasks";
+export type View = "settings" | "spaces" | "lists" | "tasks";
 
 export const currentView = signal<View>("settings");
 
 export const spaces = signal<Space[]>([]);
+
+export const selectedSpaceId = signal<string | null>(null);
+
+export const lists = signal<List[]>([]);
+
+export const selectedListId = signal<string | null>(null);
 
 export const tasks = signal<Task[]>([]);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { activeSession } from "../state";
+import { activeSession, repoMappings, selectedSpaceId } from "../state";
 import { listActivities } from "../services/jules";
 import { checkoutBranch } from "../services/git";
 
@@ -39,7 +39,15 @@ export function SessionControls() {
   };
 
   const handleCheckoutPR = async () => {
-    await checkoutBranch("/mock/repo/path", "jules-branch");
+    const spaceId = selectedSpaceId.value;
+    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
+
+    if (!repoPath) {
+      console.error("No repo path found for selected space.");
+      return;
+    }
+
+    await checkoutBranch(repoPath, "jules-branch");
     console.log("Checked out PR branch");
   };
 

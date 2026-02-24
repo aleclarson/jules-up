@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { getTasks, Task } from "../services/clickup";
-import { tasks, currentView, activeSession } from "../state";
+import { tasks, currentView, activeSession, selectedListId } from "../state";
 import { JulesPromptModal } from "./JulesPromptModal";
 
 export function TasksView() {
@@ -8,11 +8,12 @@ export function TasksView() {
 
   useEffect(() => {
     async function fetchTasks() {
-      // In a real app, pass the listId based on the selected space
-      tasks.value = await getTasks("list-123");
+      if (selectedListId.value) {
+        tasks.value = await getTasks(selectedListId.value);
+      }
     }
     fetchTasks();
-  }, []);
+  }, [selectedListId.value]);
 
   const handleOpenClickUp = (taskId: string) => {
     console.log(`Opening task ${taskId} in ClickUp`);
@@ -30,7 +31,7 @@ export function TasksView() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Tasks</h2>
-      <button onClick={() => currentView.value = "spaces"}>Back to Spaces</button>
+      <button onClick={() => currentView.value = "lists"}>Back to Lists</button>
       <ul>
         {tasks.value.map((task) => (
           <li key={task.id} style={{ marginBottom: "10px", padding: "10px", border: "1px solid #ccc" }}>

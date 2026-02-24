@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { getSpaces } from "../services/clickup";
 import { selectRepoDirectory } from "../services/git";
-import { spaces, repoMappings, currentView } from "../state";
+import { spaces, repoMappings, currentView, selectedSpaceId } from "../state";
 import { store } from "../services/store";
 
 export function SpacesView() {
@@ -16,15 +16,15 @@ export function SpacesView() {
     const repoPath = await selectRepoDirectory();
     if (repoPath) {
       repoMappings.value = { ...repoMappings.value, [spaceId]: repoPath };
-      await store.set("space_repo_mappings", repoMappings.value);
+      await store.setSpaceRepoMappings(repoMappings.value);
       await store.save();
     }
   };
 
   const handleSpaceClick = (spaceId: string) => {
-    currentView.value = "tasks";
-    // In a real app, you would pass the spaceId to load the correct tasks
-    console.log(`Navigating to tasks for space ${spaceId}`);
+    selectedSpaceId.value = spaceId;
+    currentView.value = "lists";
+    console.log(`Navigating to lists for space ${spaceId}`);
   };
 
   return (
