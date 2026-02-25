@@ -147,3 +147,28 @@
   background-color: var(--accent-color);
   color: #fff;
 }
+
+.groupHeader {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+}
+
+.groupHeader:hover {
+  background-color: var(--surface-border);
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  margin-right: 0.5rem;
+  font-size: 0.8em;
+}
+
+.collapsed {
+  transform: rotate(-90deg);
+}
