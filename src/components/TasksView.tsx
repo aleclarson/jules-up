@@ -2,7 +2,7 @@ import { useEffect } from "preact/hooks";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Task } from "../types";
 import { clickupService } from "../services/clickup";
-import { tasks, selectedListId, activeSession, currentView } from "../state";
+import { tasks, selectedListId, activeSession } from "../state";
 import { JulesPromptModal } from "./JulesPromptModal";
 import { useState } from "preact/hooks";
 import styles from "./TasksView.module.css";
@@ -72,12 +72,7 @@ export function TasksView() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <button className={styles.backButton} onClick={() => currentView.value = "lists"}>
-          &larr; Back to Lists
-        </button>
-        <h2 style={{ margin: 0 }}>Tasks</h2>
-      </div>
+      <h2 style={{ marginBottom: '2rem' }}>Tasks</h2>
       
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
@@ -87,7 +82,6 @@ export function TasksView() {
         <div className="emptyState">
           <div className="emptyIcon">∅</div>
           <p>No tasks found in this list.</p>
-          <button className={styles.backButton} onClick={() => currentView.value = "lists"}>Try Another List</button>
         </div>
       ) : (
         <div>
