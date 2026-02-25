@@ -1,4 +1,5 @@
 import { useEffect } from "preact/hooks";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { Task } from "../types";
 import { clickupService } from "../services/clickup";
 import { tasks, selectedListId, activeSession, currentView } from "../state";
@@ -98,6 +99,9 @@ export function TasksView() {
                     </div>
                     <p className={styles.description}>{task.description || "No description provided."}</p>
                     <div className={styles.taskFooter}>
+                      <button className={styles.openButton} onClick={() => openUrl(task.url)}>
+                        Open in ClickUp
+                      </button>
                       {activeSession.value?.taskId === task.id ? (
                         <div className={styles.workingLabel}>Jules is working on this...</div>
                       ) : (
