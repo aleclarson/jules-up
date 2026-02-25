@@ -118,7 +118,9 @@ export function TasksView() {
                         <h3 className={styles.taskTitle}>{task.name}</h3>
                         <span className={styles.statusBadge}>{task.status.status}</span>
                       </div>
-                      <p className={styles.description}>{task.description || "No description provided."}</p>
+                      <p className={`${styles.description} ${!task.description ? styles.placeholder : ''}`}>
+                        {task.description || "No description provided."}
+                      </p>
                       <div className={styles.taskFooter}>
                         <button className={styles.openButton} onClick={() => openUrl(task.url)}>
                           Open in ClickUp

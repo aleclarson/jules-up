@@ -174,3 +174,8 @@
 .groupHeader:hover .collapsed {
   transform: rotate(-90deg) scale(1.4);
 }
+
+.placeholder {
+  color: #484f58;
+  font-style: italic;
+}
