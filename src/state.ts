@@ -1,9 +1,9 @@
 import { signal } from "@preact/signals";
 import { Space, Task, List, JulesSession, SpaceRepoMapping } from "./types";
 
-export type View = "settings" | "spaces" | "lists" | "tasks";
+export type View = "settings" | "tasks" | "welcome";
 
-export const currentView = signal<View>("settings");
+export const currentView = signal<View>("welcome");
 
 export const spaces = signal<Space[]>([]);
 

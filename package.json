@@ -18,7 +18,8 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "@tauri-apps/plugin-store": "^2.4.2",
-    "preact": "^10.25.1"
+    "preact": "^10.25.1",
+    "swr": "^2.4.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.9.3",

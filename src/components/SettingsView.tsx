@@ -10,7 +10,7 @@ export function SettingsView() {
     await storeService.setClickUpPat(settings.value.clickup_pat);
     await storeService.setJulesApiKey(settings.value.jules_api_key);
     alert("Settings saved!");
-    currentView.value = "spaces";
+    currentView.value = "welcome";
   };
 
   return (
