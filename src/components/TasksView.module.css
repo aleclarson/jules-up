@@ -154,12 +154,6 @@
   align-items: center;
   justify-content: space-between;
   user-select: none;
-  transition: background-color 0.2s ease;
-  border-radius: 4px;
-}
-
-.groupHeader:hover {
-  background-color: var(--surface-border);
 }
 
 .chevron {
@@ -169,6 +163,14 @@
   font-size: 0.8em;
 }
 
+.groupHeader:hover .chevron {
+  transform: scale(1.4);
+}
+
 .collapsed {
   transform: rotate(-90deg);
+}
+
+.groupHeader:hover .collapsed {
+  transform: rotate(-90deg) scale(1.4);
 }
