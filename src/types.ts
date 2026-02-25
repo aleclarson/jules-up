@@ -15,6 +15,13 @@ export interface User {
   email: string;
 }
 
+export interface Priority {
+  id?: string;
+  priority: string;
+  color?: string;
+  orderindex?: string;
+}
+
 export interface Task {
   id: string;
   name: string;
@@ -24,6 +31,7 @@ export interface Task {
     color: string;
     type: string;
   };
+  priority: Priority | null;
   assignees: User[];
   list: {
     id: string;
