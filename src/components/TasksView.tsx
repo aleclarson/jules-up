@@ -6,6 +6,36 @@ import { JulesPromptModal } from "./JulesPromptModal";
 import { useState } from "preact/hooks";
 import styles from "./TasksView.module.css";
 
+function getTaskGroups(allTasks: Task[]) {
+  const openTasks = allTasks.filter((t) => t.status.type !== "closed");
+
+  openTasks.sort((a, b) => {
+    const getOrder = (t: Task) => {
+      if (!t.priority || !t.priority.orderindex) return Number.MAX_SAFE_INTEGER;
+      return parseInt(t.priority.orderindex);
+    };
+    return getOrder(a) - getOrder(b);
+  });
+
+  const groups: { title: string; color: string; tasks: Task[] }[] = [];
+
+  openTasks.forEach((task) => {
+    const rawTitle = task.priority?.priority || "No Priority";
+    // Capitalize first letter
+    const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
+    const color = task.priority?.color || "#888";
+
+    const lastGroup = groups[groups.length - 1];
+    if (lastGroup && lastGroup.title === title) {
+      lastGroup.tasks.push(task);
+    } else {
+      groups.push({ title, color, tasks: [task] });
+    }
+  });
+
+  return groups;
+}
+
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +56,8 @@ export function TasksView() {
     fetchTasks();
   }, [selectedListId.value]);
 
+  const groups = getTaskGroups(tasks.value);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -39,36 +71,50 @@ export function TasksView() {
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
           <div className="loading-spinner"></div>
         </div>
-      ) : tasks.value.length === 0 ? (
+      ) : groups.length === 0 ? (
         <div className="emptyState">
           <div className="emptyIcon">∅</div>
           <p>No tasks found in this list.</p>
           <button className={styles.backButton} onClick={() => currentView.value = "lists"}>Try Another List</button>
         </div>
       ) : (
-        <ul className={styles.taskList}>
-          {tasks.value.map((task) => (
-            <li key={task.id} className={styles.taskItem}>
-              <div className={styles.taskHeader}>
-                <h3 className={styles.taskTitle}>{task.name}</h3>
-                <span className={styles.statusBadge}>{task.status.status}</span>
-              </div>
-              <p className={styles.description}>{task.description || "No description provided."}</p>
-              <div className={styles.taskFooter}>
-                {activeSession.value?.taskId === task.id ? (
-                  <div className={styles.workingLabel}>Jules is working on this...</div>
-                ) : (
-                  <button 
-                    className={styles.delegateButton} 
-                    onClick={() => setSelectedTask(task)}
-                  >
-                    Delegate to Jules
-                  </button>
-                )}
-              </div>
-            </li>
+        <div>
+          {groups.map((group) => (
+            <div key={group.title} style={{ marginBottom: '2rem' }}>
+              <h3 style={{
+                color: group.color,
+                borderBottom: `2px solid ${group.color}`,
+                paddingBottom: '0.5rem',
+                marginBottom: '1rem'
+              }}>
+                {group.title}
+              </h3>
+              <ul className={styles.taskList}>
+                {group.tasks.map((task) => (
+                  <li key={task.id} className={styles.taskItem}>
+                    <div className={styles.taskHeader}>
+                      <h3 className={styles.taskTitle}>{task.name}</h3>
+                      <span className={styles.statusBadge}>{task.status.status}</span>
+                    </div>
+                    <p className={styles.description}>{task.description || "No description provided."}</p>
+                    <div className={styles.taskFooter}>
+                      {activeSession.value?.taskId === task.id ? (
+                        <div className={styles.workingLabel}>Jules is working on this...</div>
+                      ) : (
+                        <button
+                          className={styles.delegateButton}
+                          onClick={() => setSelectedTask(task)}
+                        >
+                          Delegate to Jules
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {selectedTask && (
