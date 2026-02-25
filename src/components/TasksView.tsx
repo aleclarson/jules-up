@@ -40,6 +40,17 @@ function getTaskGroups(allTasks: Task[]) {
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (title: string) => {
+    const newCollapsed = new Set(collapsedGroups);
+    if (newCollapsed.has(title)) {
+      newCollapsed.delete(title);
+    } else {
+      newCollapsed.add(title);
+    }
+    setCollapsedGroups(newCollapsed);
+  };
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -82,40 +93,51 @@ export function TasksView() {
         <div>
           {groups.map((group) => (
             <div key={group.title} style={{ marginBottom: '2rem' }}>
-              <h3 style={{
-                color: group.color,
-                borderBottom: `2px solid ${group.color}`,
-                paddingBottom: '0.5rem',
-                marginBottom: '1rem'
-              }}>
-                {group.title}
+              <h3
+                className={styles.groupHeader}
+                onClick={() => toggleGroup(group.title)}
+                style={{
+                  color: group.color,
+                  borderBottom: `2px solid ${group.color}`,
+                  paddingBottom: '0.5rem',
+                  marginBottom: '1rem'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className={`${styles.chevron} ${collapsedGroups.has(group.title) ? styles.collapsed : ''}`}>
+                    ▼
+                  </span>
+                  {group.title}
+                </div>
               </h3>
-              <ul className={styles.taskList}>
-                {group.tasks.map((task) => (
-                  <li key={task.id} className={styles.taskItem}>
-                    <div className={styles.taskHeader}>
-                      <h3 className={styles.taskTitle}>{task.name}</h3>
-                      <span className={styles.statusBadge}>{task.status.status}</span>
-                    </div>
-                    <p className={styles.description}>{task.description || "No description provided."}</p>
-                    <div className={styles.taskFooter}>
-                      <button className={styles.openButton} onClick={() => openUrl(task.url)}>
-                        Open in ClickUp
-                      </button>
-                      {activeSession.value?.taskId === task.id ? (
-                        <div className={styles.workingLabel}>Jules is working on this...</div>
-                      ) : (
-                        <button
-                          className={styles.delegateButton}
-                          onClick={() => setSelectedTask(task)}
-                        >
-                          Delegate to Jules
+              {!collapsedGroups.has(group.title) && (
+                <ul className={styles.taskList}>
+                  {group.tasks.map((task) => (
+                    <li key={task.id} className={styles.taskItem}>
+                      <div className={styles.taskHeader}>
+                        <h3 className={styles.taskTitle}>{task.name}</h3>
+                        <span className={styles.statusBadge}>{task.status.status}</span>
+                      </div>
+                      <p className={styles.description}>{task.description || "No description provided."}</p>
+                      <div className={styles.taskFooter}>
+                        <button className={styles.openButton} onClick={() => openUrl(task.url)}>
+                          Open in ClickUp
                         </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                        {activeSession.value?.taskId === task.id ? (
+                          <div className={styles.workingLabel}>Jules is working on this...</div>
+                        ) : (
+                          <button
+                            className={styles.delegateButton}
+                            onClick={() => setSelectedTask(task)}
+                          >
+                            Delegate to Jules
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
         </div>

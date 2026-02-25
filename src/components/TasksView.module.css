@@ -147,3 +147,30 @@
   background-color: var(--accent-color);
   color: #fff;
 }
+
+.groupHeader {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  margin-right: 0.5rem;
+  font-size: 0.8em;
+}
+
+.groupHeader:hover .chevron {
+  transform: scale(1.4);
+}
+
+.collapsed {
+  transform: rotate(-90deg);
+}
+
+.groupHeader:hover .collapsed {
+  transform: rotate(-90deg) scale(1.4);
+}
