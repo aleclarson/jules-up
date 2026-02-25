@@ -37,6 +37,7 @@ export interface Task {
     id: string;
     name: string;
   };
+  url: string;
 }
 
 export type SessionStatus = 'active' | 'paused' | 'archived';
