@@ -7,8 +7,15 @@
     "core:default",
     "opener:default",
     "store:default",
-    "http:default",
     "shell:default",
-    "dialog:default"
+    "dialog:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://api.clickup.com/*" },
+        { "url": "https://jules.googleapis.com/*" }
+      ],
+      "deny": []
+    }
   ]
 }
