@@ -1,10 +1,9 @@
-import { useEffect } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Task } from "../types";
-import { clickupService } from "../services/clickup";
-import { tasks, selectedListId, activeSession } from "../state";
+import { activeSession, selectedListId } from "../state";
+import { useTasks } from "../hooks/useClickUp";
 import { JulesPromptModal } from "./JulesPromptModal";
-import { useState } from "preact/hooks";
 import styles from "./TasksView.module.css";
 
 function getTaskGroups(allTasks: Task[]) {
@@ -39,7 +38,6 @@ function getTaskGroups(allTasks: Task[]) {
 
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const toggleGroup = (title: string) => {
@@ -52,31 +50,22 @@ export function TasksView() {
     setCollapsedGroups(newCollapsed);
   };
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      if (selectedListId.value) {
-        setIsLoading(true);
-        try {
-          tasks.value = await clickupService.getTasks(selectedListId.value);
-        } catch (e) {
-          console.error(e);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchTasks();
-  }, [selectedListId.value]);
+  // Use SWR hook for tasks
+  const { tasks, isLoading, isError } = useTasks(selectedListId.value);
 
-  const groups = getTaskGroups(tasks.value);
+  const groups = getTaskGroups(tasks);
 
   return (
     <div className={styles.container}>
       <h2 style={{ marginBottom: '2rem' }}>Tasks</h2>
       
-      {isLoading ? (
+      {isLoading && tasks.length === 0 ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
           <div className="loading-spinner"></div>
+        </div>
+      ) : isError ? (
+         <div className="emptyState">
+          <p>Error loading tasks.</p>
         </div>
       ) : groups.length === 0 ? (
         <div className="emptyState">
