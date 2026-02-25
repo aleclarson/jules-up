@@ -1,10 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { currentView, activeSession, settings, repoMappings } from "./state";
 import { SettingsView } from "./components/SettingsView";
-import { SpacesView } from "./components/SpacesView";
-import { ListsView } from "./components/ListsView";
 import { TasksView } from "./components/TasksView";
 import { SessionControls } from "./components/SessionControls";
+import { Sidebar } from "./components/Sidebar";
 import { storeService } from "./services/store";
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
       repoMappings.value = mappings;
 
       if (pat && apiKey) {
-        currentView.value = "spaces";
+        currentView.value = "welcome";
         setShowToast(true);
         setTimeout(() => setShowToast(false), 2000);
       } else {
@@ -47,27 +46,32 @@ function App() {
     switch (currentView.value) {
       case "settings":
         return <SettingsView />;
-      case "spaces":
-        return <SpacesView />;
-      case "lists":
-        return <ListsView />;
       case "tasks":
         return <TasksView />;
+      case "welcome":
       default:
-        return <SettingsView />;
+        return (
+          <div className="emptyState" style={{ height: '100%', border: 'none', background: 'transparent' }}>
+             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+             <h2>Welcome to Jules Desktop</h2>
+             <p>Select a list from the sidebar to view tasks.</p>
+          </div>
+        );
     }
   };
 
   return (
-    <div className="container">
-      <h1>Jules Desktop</h1>
-      {renderView()}
-      {activeSession.value && <SessionControls />}
-      {showToast && (
-        <div className="toast">
-          <span style={{ color: 'var(--accent-color)' }}>✦</span> Welcome back
-        </div>
-      )}
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+      <Sidebar />
+      <div style={{ flex: 1, overflowY: 'auto', padding: '2rem', position: 'relative' }}>
+        {renderView()}
+        {activeSession.value && <SessionControls />}
+        {showToast && (
+          <div className="toast">
+            <span style={{ color: 'var(--accent-color)' }}>✦</span> Welcome back
+          </div>
+        )}
+      </div>
     </div>
   );
 }
