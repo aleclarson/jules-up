@@ -25,13 +25,23 @@ export class ClickUpService {
   }
 
   async getTeams(): Promise<any[]> {
-    const response = await fetch(`${API_BASE}/team`, {
-      method: 'GET',
-      headers: await this.getHeaders(),
-    });
-    if (!response.ok) throw new Error(`Failed to fetch teams: ${response.statusText}`);
-    const data = await response.json();
-    return data.teams;
+    try {
+      const response = await fetch(`${API_BASE}/team`, {
+        method: 'GET',
+        headers: await this.getHeaders(),
+      });
+      if (!response.ok) throw new Error(`Failed to fetch teams: ${response.statusText}`);
+      const data = await response.json();
+      return data.teams;
+    } catch (error: any) {
+      console.error("Error fetching ClickUp teams:", error);
+      // Gracefully handle scope errors by returning empty list
+      if (error.toString().includes("scope") || error.toString().includes("url not allowed")) {
+        console.warn("ClickUp API scope error. Please check Tauri capabilities.");
+        return [];
+      }
+      throw error;
+    }
   }
 
   async getSpaces(): Promise<Space[]> {
