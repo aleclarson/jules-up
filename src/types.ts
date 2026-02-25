@@ -61,3 +61,5 @@ export interface Activity {
 export type SpaceRepoMapping = Record<string, string>;
 
 export type ActiveJulesSessions = Record<string, JulesSession>;
+
+export type TaskPrLinks = Record<string, string>;

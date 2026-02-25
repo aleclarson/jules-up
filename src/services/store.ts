@@ -1,5 +1,5 @@
 import { load, Store } from "@tauri-apps/plugin-store";
-import { SpaceRepoMapping, ActiveJulesSessions, JulesSession } from "../types";
+import { SpaceRepoMapping, ActiveJulesSessions, JulesSession, TaskPrLinks } from "../types";
 
 const STORE_FILENAME = "app_settings.json";
 
@@ -51,6 +51,17 @@ export class StoreService {
   async setActiveJulesSessions(sessions: ActiveJulesSessions): Promise<void> {
     const store = await this.storePromise;
     await store.set("active_jules_sessions", sessions);
+    await store.save();
+  }
+
+  async getTaskPrLinks(): Promise<TaskPrLinks> {
+    const store = await this.storePromise;
+    return (await store.get<TaskPrLinks>("task_pr_links")) || {};
+  }
+
+  async setTaskPrLinks(links: TaskPrLinks): Promise<void> {
+    const store = await this.storePromise;
+    await store.set("task_pr_links", links);
     await store.save();
   }
 

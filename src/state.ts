@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals";
-import { Space, Task, List, JulesSession, SpaceRepoMapping } from "./types";
+import { Space, Task, List, JulesSession, SpaceRepoMapping, TaskPrLinks } from "./types";
 
 export type View = "settings" | "spaces" | "lists" | "tasks";
 
@@ -24,3 +24,6 @@ export const activeSession = signal<JulesSession | null>(null);
 
 // Mappings: spaceId -> repoPath
 export const repoMappings = signal<SpaceRepoMapping>({});
+
+// Mappings: taskId -> prLink
+export const taskPrLinks = signal<TaskPrLinks>({});

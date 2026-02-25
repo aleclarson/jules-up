@@ -1,10 +1,12 @@
 import { useEffect } from "preact/hooks";
 import { Task } from "../types";
 import { clickupService } from "../services/clickup";
-import { tasks, selectedListId, activeSession, currentView } from "../state";
+import { tasks, selectedListId, activeSession, currentView, taskPrLinks } from "../state";
 import { JulesPromptModal } from "./JulesPromptModal";
 import { useState } from "preact/hooks";
 import styles from "./TasksView.module.css";
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { storeService } from "../services/store";
 
 function getTaskGroups(allTasks: Task[]) {
   const openTasks = allTasks.filter((t) => t.status.type !== "closed");
@@ -39,6 +41,8 @@ function getTaskGroups(allTasks: Task[]) {
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingPrTaskId, setEditingPrTaskId] = useState<string | null>(null);
+  const [prLinkInput, setPrLinkInput] = useState("");
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -46,6 +50,7 @@ export function TasksView() {
         setIsLoading(true);
         try {
           tasks.value = await clickupService.getTasks(selectedListId.value);
+          taskPrLinks.value = await storeService.getTaskPrLinks();
         } catch (e) {
           console.error(e);
         } finally {
@@ -55,6 +60,16 @@ export function TasksView() {
     };
     fetchTasks();
   }, [selectedListId.value]);
+
+  const handleSavePrLink = async () => {
+    if (editingPrTaskId) {
+      const newLinks = { ...taskPrLinks.value, [editingPrTaskId]: prLinkInput };
+      taskPrLinks.value = newLinks;
+      await storeService.setTaskPrLinks(newLinks);
+      setEditingPrTaskId(null);
+      setPrLinkInput("");
+    }
+  };
 
   const groups = getTaskGroups(tasks.value);
 
@@ -108,6 +123,61 @@ export function TasksView() {
                           Delegate to Jules
                         </button>
                       )}
+
+                      <div className={styles.prControls}>
+                        {editingPrTaskId === task.id ? (
+                          <div className={styles.inputContainer}>
+                            <input
+                              type="text"
+                              className={styles.prInput}
+                              value={prLinkInput}
+                              onInput={(e) => setPrLinkInput(e.currentTarget.value)}
+                              placeholder="PR URL"
+                            />
+                            <button
+                              className={styles.saveButton}
+                              onClick={handleSavePrLink}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className={styles.cancelButton}
+                              onClick={() => setEditingPrTaskId(null)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : taskPrLinks.value[task.id] ? (
+                          <div className={styles.prControls}>
+                            <button
+                              className={styles.openPrButton}
+                              onClick={() => openUrl(taskPrLinks.value[task.id])}
+                            >
+                              Open PR ↗
+                            </button>
+                            <button
+                              className={styles.editPrButton}
+                              onClick={() => {
+                                setEditingPrTaskId(task.id);
+                                setPrLinkInput(taskPrLinks.value[task.id]);
+                              }}
+                              title="Edit PR Link"
+                            >
+                              ✎
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            className={styles.linkPrButton}
+                            onClick={() => {
+                              setEditingPrTaskId(task.id);
+                              setPrLinkInput("");
+                            }}
+                          >
+                            + Link PR
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </li>
                 ))}
