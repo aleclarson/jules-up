@@ -37,6 +37,11 @@ function getTaskGroups(allTasks: Task[]) {
   return groups;
 }
 
+function formatDescription(description: string) {
+  if (!description) return "No description provided.";
+  return description.replace(/\n/g, " ↵ ");
+}
+
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
@@ -124,7 +129,7 @@ export function TasksView() {
                         <span className={styles.statusBadge}>{task.status.status}</span>
                       </div>
                       <p className={`${styles.description} ${!task.description ? styles.placeholder : ''}`}>
-                        {task.description || "No description provided."}
+                        {formatDescription(task.description)}
                       </p>
                       <div className={styles.taskFooter}>
                         <button className={styles.openButton} onClick={() => openUrl(task.url)}>
