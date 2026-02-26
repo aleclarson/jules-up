@@ -4,7 +4,7 @@ import { settings, saveSettings, navigateTo } from "../state";
 import styles from "./SettingsView.module.css";
 
 export function SettingsView() {
-  const [localSettings, setLocalSettings] = useState(settings.value);
+  const [localSettings, setLocalSettings] = useState(settings.peek());
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSave = async () => {
