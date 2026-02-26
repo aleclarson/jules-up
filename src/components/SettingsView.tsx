@@ -7,17 +7,6 @@ export function SettingsView() {
   const [localSettings, setLocalSettings] = useState(settings.peek());
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleSave = async () => {
-    // 1. Update Global State
-    saveSettings(localSettings);
-    // 2. Persist to Store
-    await storeService.setClickUpPat(localSettings.clickup_pat);
-    await storeService.setJulesApiKey(localSettings.jules_api_key);
-
-    alert("Settings saved!");
-    navigateTo("welcome");
-  };
-
   return (
     <div className={styles.container}>
       <h2>Settings</h2>
@@ -47,7 +36,18 @@ export function SettingsView() {
         />
       </div>
 
-      <button className={styles.saveButton} onClick={handleSave}>Save and Continue</button>
+      <button
+        className={styles.saveButton}
+        onClick={async () => {
+          saveSettings(localSettings);
+          await storeService.setClickUpPat(localSettings.clickup_pat);
+          await storeService.setJulesApiKey(localSettings.jules_api_key);
+          alert("Settings saved!");
+          navigateTo("welcome");
+        }}
+      >
+        Save and Continue
+      </button>
     </div>
   );
 }

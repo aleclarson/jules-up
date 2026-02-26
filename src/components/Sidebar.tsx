@@ -13,37 +13,19 @@ function SpaceItem({ space }: { space: Space }) {
     isCollapsed ? null : space.id,
   );
 
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
-  const handleMapRepo = async (e: Event) => {
-    e.stopPropagation();
-    const repoPath = await gitService.selectRepoDirectory();
-    if (repoPath) {
-      mapSpaceToRepo(space.id, repoPath);
-      // We need to get the latest value for persistence since state updates might be async or batched,
-      // but here we can just construct it or read from the updated signal if we trust it's synchronous enough.
-      // However, to be safe and cleaner, we should probably let the effect or store service handle it.
-      // For now, let's persist the updated map.
-      // Since addRepoMapping updates the signal, we can read it back.
-      await storeService.setSpaceRepoMappings({ ...repoMappings.value, [space.id]: repoPath });
-    }
-  };
-
-  const handleSelectList = (listId: string) => {
-    selectList(listId);
-    selectSpace(space.id);
-    navigateTo("tasks");
-  };
-
   return (
     <div className={styles.spaceItem}>
-      <div className={styles.spaceHeader} onClick={toggleCollapse}>
-        <div
-          style={{ display: "flex", alignItems: "center", overflow: "hidden" }}
-        >
-          <span className={styles.folderIcon}>{isCollapsed ? "📁" : "📂"}</span>
+      <div
+        className={styles.spaceHeader}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+          <span className={styles.folderIcon}>
+            {isCollapsed ? '📁' : '📂'}
+          </span>
           <span className={styles.spaceName} title={space.name}>
             {space.name}
+          </span>
           </span>
           {repoMappings.value[space.id] && (
             <span
@@ -56,7 +38,14 @@ function SpaceItem({ space }: { space: Space }) {
         </div>
         <button
           className={styles.mapButton}
-          onClick={handleMapRepo}
+          onClick={async (e) => {
+            e.stopPropagation();
+            const repoPath = await gitService.selectRepoDirectory();
+            if (repoPath) {
+              mapSpaceToRepo(space.id, repoPath);
+              await storeService.setSpaceRepoMappings({ ...repoMappings.value, [space.id]: repoPath });
+            }
+          }}
           title={repoMappings.value[space.id] || "Map to Git Repo"}
         >
           {repoMappings.value[space.id] ? "Mapped" : "Map"}
@@ -90,7 +79,11 @@ function SpaceItem({ space }: { space: Space }) {
               <div
                 key={list.id}
                 className={`${styles.listItem} ${selectedListId.value === list.id ? styles.listItemSelected : ''}`}
-                onClick={() => handleSelectList(list.id)}
+                onClick={() => {
+                  selectList(list.id);
+                  selectSpace(space.id);
+                  navigateTo("tasks");
+                }}
               >
                 {list.name}
               </div>

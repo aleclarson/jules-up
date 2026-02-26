@@ -23,7 +23,9 @@ This is a **Tauri 2.0** desktop application using a **Frontend-Heavy** architect
     - **Global State Mutations**: All global state mutations must be encapsulated in **exported functions** (async or sync) within the declaring module (e.g., `src/state.ts`).
     - **Semantic Actions**: Avoid simple setters (e.g., `setActiveSession`). Use semantic action names (e.g., `startActiveSession`, `saveSettings`, `clearActiveSession`).
     - **No Direct Mutation**: Never mutate `.value` directly in components.
-6.  **Formatting**: Always run `npm run format` after modifying files to maintain consistent code style.
+6.  **Component Design**:
+    - **Inline Handlers**: Prefer inlining event handlers if they are only called in one place.
+7.  **Formatting**: Always run `npm run format` after modifying files to maintain consistent code style.
 
 ## File Structure
 

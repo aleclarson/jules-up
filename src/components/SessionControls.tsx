@@ -25,23 +25,6 @@ export function SessionControls() {
 
   if (!activeSession.value) return null;
 
-  const handleApprove = async () => {
-    await julesService.approvePlan(activeSession.value!.sessionId);
-  };
-
-  const handleCheckout = async () => {
-    const spaceId = selectedSpaceId.value;
-    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
-    if (repoPath) {
-      await gitService.checkoutBranch(repoPath, "jules-branch");
-      alert("Checked out branch: jules-branch");
-    }
-  };
-
-  const handleArchive = () => {
-    clearActiveSession();
-  };
-
   return (
     <div className={styles.container}>
       <h3>Active Jules Session: {activeSession.value.taskId}</h3>
@@ -66,13 +49,29 @@ export function SessionControls() {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.approveButton} onClick={handleApprove}>
+        <button
+          className={styles.approveButton}
+          onClick={async () => await julesService.approvePlan(activeSession.value!.sessionId)}
+        >
           Approve Plan
         </button>
-        <button className={styles.checkoutButton} onClick={handleCheckout}>
+        <button
+          className={styles.checkoutButton}
+          onClick={async () => {
+            const spaceId = selectedSpaceId.value;
+            const repoPath = spaceId ? repoMappings.value[spaceId] : null;
+            if (repoPath) {
+              await gitService.checkoutBranch(repoPath, "jules-branch");
+              alert("Checked out branch: jules-branch");
+            }
+          }}
+        >
           Checkout PR Branch
         </button>
-        <button className={styles.archiveButton} onClick={handleArchive}>
+        <button
+          className={styles.archiveButton}
+          onClick={() => clearActiveSession()}
+        >
           Archive Session
         </button>
       </div>
