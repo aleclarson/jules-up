@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { storeService } from "../services/store";
-import { settings, currentView } from "../state";
+import { settings, setClickUpPat, setJulesApiKey, setCurrentView } from "../state";
 import styles from "./SettingsView.module.css";
 
 export function SettingsView() {
@@ -10,7 +10,7 @@ export function SettingsView() {
     await storeService.setClickUpPat(settings.value.clickup_pat);
     await storeService.setJulesApiKey(settings.value.jules_api_key);
     alert("Settings saved!");
-    currentView.value = "welcome";
+    setCurrentView("welcome");
   };
 
   return (
@@ -22,12 +22,7 @@ export function SettingsView() {
           type={focusedField === "clickup_pat" ? "text" : "password"}
           className={styles.input}
           value={settings.value.clickup_pat}
-          onInput={(e) =>
-            (settings.value = {
-              ...settings.value,
-              clickup_pat: (e.target as HTMLInputElement).value,
-            })
-          }
+          onInput={(e) => setClickUpPat((e.target as HTMLInputElement).value)}
           onFocus={() => setFocusedField("clickup_pat")}
           onBlur={() => setFocusedField(null)}
           placeholder="pk_..."
@@ -40,12 +35,7 @@ export function SettingsView() {
           type={focusedField === "jules_api_key" ? "text" : "password"}
           className={styles.input}
           value={settings.value.jules_api_key}
-          onInput={(e) =>
-            (settings.value = {
-              ...settings.value,
-              jules_api_key: (e.target as HTMLInputElement).value,
-            })
-          }
+          onInput={(e) => setJulesApiKey((e.target as HTMLInputElement).value)}
           onFocus={() => setFocusedField("jules_api_key")}
           onBlur={() => setFocusedField(null)}
           placeholder="AI..."

@@ -1,12 +1,7 @@
 import { useState } from "preact/hooks";
 import { gitService } from "../services/git";
 import { storeService } from "../services/store";
-import {
-  selectedListId,
-  selectedSpaceId,
-  currentView,
-  repoMappings,
-} from "../state";
+import { selectedListId, repoMappings, addRepoMapping, setSelectedListId, setSelectedSpaceId, setCurrentView } from "../state";
 import { useSpaces, useLists } from "../hooks/useClickUp";
 import styles from "./Sidebar.module.css";
 import { Space } from "../types";
@@ -24,15 +19,20 @@ function SpaceItem({ space }: { space: Space }) {
     e.stopPropagation();
     const repoPath = await gitService.selectRepoDirectory();
     if (repoPath) {
-      repoMappings.value = { ...repoMappings.value, [space.id]: repoPath };
-      await storeService.setSpaceRepoMappings(repoMappings.value);
+      addRepoMapping(space.id, repoPath);
+      // We need to get the latest value for persistence since state updates might be async or batched,
+      // but here we can just construct it or read from the updated signal if we trust it's synchronous enough.
+      // However, to be safe and cleaner, we should probably let the effect or store service handle it.
+      // For now, let's persist the updated map.
+      // Since addRepoMapping updates the signal, we can read it back.
+      await storeService.setSpaceRepoMappings({ ...repoMappings.value, [space.id]: repoPath });
     }
   };
 
   const selectList = (listId: string) => {
-    selectedListId.value = listId;
-    selectedSpaceId.value = space.id;
-    currentView.value = "tasks";
+    setSelectedListId(listId);
+    setSelectedSpaceId(space.id);
+    setCurrentView("tasks");
   };
 
   return (
@@ -129,7 +129,7 @@ export function Sidebar() {
       <div className={styles.footer}>
         <button
           className={styles.settingsButton}
-          onClick={() => (currentView.value = "settings")}
+          onClick={() => setCurrentView("settings")}
         >
           ⚙️ Settings
         </button>

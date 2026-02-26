@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { julesSessions, activeSession } from "../state";
+import { julesSessions, updateSessionPrLink } from "../state";
 import { julesService } from "../services/jules";
 import { storeService } from "../services/store";
 
@@ -25,25 +25,13 @@ export function useJulesPoller() {
           // Check for PR link in outputs
           const prUrl = remoteSession.outputs?.pullRequest?.url;
           if (prUrl) {
-            // Create updated session object
-            const updatedSession = {
-              ...session,
-              prLink: prUrl,
-            };
+             // Update state
+             updateSessionPrLink(session.taskId, prUrl);
 
-            // Update state atomically-ish
-            // We re-read julesSessions.value to ensure we don't overwrite other changes
-            const latestSessions = {
-              ...julesSessions.value,
-              [session.taskId]: updatedSession,
-            };
-            julesSessions.value = latestSessions;
-            await storeService.setActiveJulesSessions(latestSessions);
-
-            // Update activeSession if it matches
-            if (activeSession.value?.sessionId === session.sessionId) {
-              activeSession.value = { ...activeSession.value, prLink: prUrl };
-            }
+             // Persist the updated state.
+             // Note: updateSessionPrLink updates the signal.
+             // We can read the fresh value from julesSessions.value
+             await storeService.setActiveJulesSessions(julesSessions.value);
           }
         } catch (e) {
           console.error(`Failed to poll session ${session.sessionId}`, e);
