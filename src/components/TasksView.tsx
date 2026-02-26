@@ -2,7 +2,7 @@ import { useState, useMemo } from "preact/hooks";
 import Fuse from "fuse.js";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Task } from "../types";
-import { activeSession, selectedListId, julesSessions } from "../state";
+import { selectedListId, julesSessions } from "../state";
 import { useTasks } from "../hooks/useClickUp";
 import { JulesPromptModal } from "./JulesPromptModal";
 import styles from "./TasksView.module.css";

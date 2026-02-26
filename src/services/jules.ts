@@ -1,6 +1,6 @@
 import { fetch } from "@tauri-apps/plugin-http";
 import { storeService } from "./store";
-import { JulesSession, Activity } from "../types";
+import { Activity } from "../types";
 
 const API_BASE = "https://jules.googleapis.com/v1alpha";
 

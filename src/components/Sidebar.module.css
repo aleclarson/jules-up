@@ -16,6 +16,35 @@
   color: var(--text-primary);
 }
 
+.navSection {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.navItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.activeNavItem {
+  background-color: rgba(var(--accent-color-rgb), 0.1);
+  color: var(--accent-color);
+}
+
 .spacesList {
   flex: 1;
   overflow-y: auto;

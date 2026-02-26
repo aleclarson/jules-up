@@ -145,6 +145,16 @@ export class ClickUpService {
         throw new Error(`Failed to delegate task: ${response.statusText}`);
     }
   }
+
+  async getTask(taskId: string): Promise<Task> {
+    const response = await fetch(`${API_BASE}/task/${taskId}`, {
+      method: 'GET',
+      headers: await this.getHeaders(),
+    });
+    if (!response.ok) throw new Error(`Failed to fetch task: ${response.statusText}`);
+    const data = await response.json();
+    return data;
+  }
 }
 
 export const clickupService = new ClickUpService();
