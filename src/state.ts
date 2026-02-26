@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals";
-import { Space, Task, List, JulesSession, SpaceRepoMapping } from "./types";
+import { Space, Task, List, JulesSession, SpaceRepoMapping, ActiveJulesSessions } from "./types";
 
 export type View = "settings" | "tasks" | "welcome";
 
@@ -21,6 +21,8 @@ export const settings = signal<{ clickup_pat: string; jules_api_key: string }>({
 });
 
 export const activeSession = signal<JulesSession | null>(null);
+
+export const julesSessions = signal<ActiveJulesSessions>({});
 
 // Mappings: spaceId -> repoPath
 export const repoMappings = signal<SpaceRepoMapping>({});

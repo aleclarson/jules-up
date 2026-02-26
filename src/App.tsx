@@ -1,26 +1,32 @@
 import { useEffect, useState } from "preact/hooks";
-import { currentView, activeSession, settings, repoMappings } from "./state";
+import { currentView, activeSession, settings, repoMappings, julesSessions } from "./state";
 import { SettingsView } from "./components/SettingsView";
 import { TasksView } from "./components/TasksView";
 import { SessionControls } from "./components/SessionControls";
 import { Sidebar } from "./components/Sidebar";
 import { storeService } from "./services/store";
+import { useJulesPoller } from "./hooks/useJulesPoller";
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [showToast, setShowToast] = useState(false);
+
+  // Initialize Jules Poller
+  useJulesPoller();
 
   useEffect(() => {
     const init = async () => {
       const pat = await storeService.getClickUpPat();
       const apiKey = await storeService.getJulesApiKey();
       const mappings = await storeService.getSpaceRepoMappings();
+      const sessions = await storeService.getActiveJulesSessions();
 
       settings.value = {
         clickup_pat: pat || "",
         jules_api_key: apiKey || "",
       };
       repoMappings.value = mappings;
+      julesSessions.value = sessions;
 
       if (pat && apiKey) {
         currentView.value = "welcome";

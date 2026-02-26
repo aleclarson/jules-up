@@ -1,8 +1,10 @@
 import { useState } from "preact/hooks";
 import { Task } from "../types";
 import { julesService } from "../services/jules";
-import { activeSession, repoMappings, selectedSpaceId } from "../state";
+import { storeService } from "../services/store";
+import { activeSession, repoMappings, selectedSpaceId, julesSessions } from "../state";
 import styles from "./JulesPromptModal.module.css";
+import { JulesSession } from "../types";
 
 interface JulesPromptModalProps {
   task: Task;
@@ -22,15 +24,22 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
     }
 
     // 1. Create session
-    const session = await julesService.createSession(prompt, { taskId: task.id, repoPath });
+    const sessionResponse = await julesService.createSession(prompt, { taskId: task.id, repoPath });
 
-    // 2. Update active session state
-    activeSession.value = {
-      sessionId: session.sessionId,
+    const newSession: JulesSession = {
+      sessionId: sessionResponse.sessionId,
       status: "active",
       taskId: task.id,
       repoPath: repoPath as string,
     };
+
+    // 2. Update active session state
+    activeSession.value = newSession;
+
+    // 3. Persist session
+    const updatedSessions = { ...julesSessions.value, [task.id]: newSession };
+    julesSessions.value = updatedSessions;
+    await storeService.setActiveJulesSessions(updatedSessions);
 
     onClose();
   };
