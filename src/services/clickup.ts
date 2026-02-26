@@ -9,17 +9,18 @@ export class ClickUpService {
     const pat = await storeService.getClickUpPat();
     if (!pat) throw new Error("ClickUp PAT not configured");
     return {
-      "Authorization": pat,
+      Authorization: pat,
       "Content-Type": "application/json",
     };
   }
 
   async getUser(): Promise<User> {
     const response = await fetch(`${API_BASE}/user`, {
-      method: 'GET',
+      method: "GET",
       headers: await this.getHeaders(),
     });
-    if (!response.ok) throw new Error(`Failed to fetch user: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(`Failed to fetch user: ${response.statusText}`);
     const data = await response.json();
     return data.user;
   }
@@ -27,17 +28,23 @@ export class ClickUpService {
   async getTeams(): Promise<any[]> {
     try {
       const response = await fetch(`${API_BASE}/team`, {
-        method: 'GET',
+        method: "GET",
         headers: await this.getHeaders(),
       });
-      if (!response.ok) throw new Error(`Failed to fetch teams: ${response.statusText}`);
+      if (!response.ok)
+        throw new Error(`Failed to fetch teams: ${response.statusText}`);
       const data = await response.json();
       return data.teams;
     } catch (error: any) {
       console.error("Error fetching ClickUp teams:", error);
       // Gracefully handle scope errors by returning empty list
-      if (error.toString().includes("scope") || error.toString().includes("url not allowed")) {
-        console.warn("ClickUp API scope error. Please check Tauri capabilities.");
+      if (
+        error.toString().includes("scope") ||
+        error.toString().includes("url not allowed")
+      ) {
+        console.warn(
+          "ClickUp API scope error. Please check Tauri capabilities.",
+        );
         return [];
       }
       throw error;
@@ -49,10 +56,13 @@ export class ClickUpService {
     let allSpaces: Space[] = [];
 
     for (const team of teams) {
-      const response = await fetch(`${API_BASE}/team/${team.id}/space?archived=false`, {
-        method: 'GET',
-        headers: await this.getHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE}/team/${team.id}/space?archived=false`,
+        {
+          method: "GET",
+          headers: await this.getHeaders(),
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         allSpaces = allSpaces.concat(data.spaces);
@@ -69,20 +79,26 @@ export class ClickUpService {
     let lists: List[] = [];
 
     // 1. Fetch folderless lists
-    const listsResponse = await fetch(`${API_BASE}/space/${spaceId}/list?archived=false`, {
-      method: 'GET',
-      headers,
-    });
+    const listsResponse = await fetch(
+      `${API_BASE}/space/${spaceId}/list?archived=false`,
+      {
+        method: "GET",
+        headers,
+      },
+    );
     if (listsResponse.ok) {
       const data = await listsResponse.json();
       lists = lists.concat(data.lists);
     }
 
     // 2. Fetch folders
-    const foldersResponse = await fetch(`${API_BASE}/space/${spaceId}/folder?archived=false`, {
-      method: 'GET',
-      headers,
-    });
+    const foldersResponse = await fetch(
+      `${API_BASE}/space/${spaceId}/folder?archived=false`,
+      {
+        method: "GET",
+        headers,
+      },
+    );
 
     if (foldersResponse.ok) {
       const data = await foldersResponse.json();
@@ -91,10 +107,13 @@ export class ClickUpService {
       // 3. Fetch lists for each folder in parallel
       const folderListsPromises = folders.map(async (folder: any) => {
         try {
-          const res = await fetch(`${API_BASE}/folder/${folder.id}/list?archived=false`, {
-            method: 'GET',
-            headers
-          });
+          const res = await fetch(
+            `${API_BASE}/folder/${folder.id}/list?archived=false`,
+            {
+              method: "GET",
+              headers,
+            },
+          );
           if (res.ok) {
             const folderData = await res.json();
             return folderData.lists || [];
@@ -107,7 +126,7 @@ export class ClickUpService {
       });
 
       const foldersListsResults = await Promise.all(folderListsPromises);
-      foldersListsResults.forEach(folderLists => {
+      foldersListsResults.forEach((folderLists) => {
         lists = lists.concat(folderLists);
       });
     }
@@ -116,11 +135,15 @@ export class ClickUpService {
   }
 
   async getTasks(listId: string): Promise<Task[]> {
-    const response = await fetch(`${API_BASE}/list/${listId}/task?archived=false`, {
-      method: 'GET',
-      headers: await this.getHeaders(),
-    });
-    if (!response.ok) throw new Error(`Failed to fetch tasks: ${response.statusText}`);
+    const response = await fetch(
+      `${API_BASE}/list/${listId}/task?archived=false`,
+      {
+        method: "GET",
+        headers: await this.getHeaders(),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Failed to fetch tasks: ${response.statusText}`);
     const data = await response.json();
     return data.tasks;
   }
@@ -136,13 +159,13 @@ export class ClickUpService {
       body: JSON.stringify({
         status: "in progress",
         assignees: {
-          add: [userIdNum]
-        }
+          add: [userIdNum],
+        },
       }),
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to delegate task: ${response.statusText}`);
+      throw new Error(`Failed to delegate task: ${response.statusText}`);
     }
   }
 }

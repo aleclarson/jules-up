@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc -p . --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.9.3",
     "@tauri-apps/cli": "^2",
+    "prettier": "3.8.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.3"
   }

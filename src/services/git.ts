@@ -10,7 +10,7 @@ export class GitService {
     // selected can be string or string[] or null. Since multiple is false, it should be string or null.
     // However, the types might be strict, so I'll cast it.
     if (Array.isArray(selected)) {
-        return selected[0] || null;
+      return selected[0] || null;
     }
     return selected as string | null;
   }
@@ -31,7 +31,7 @@ export class GitService {
     });
     const checkoutOutput = await checkoutCmd.execute();
     if (checkoutOutput.code !== 0) {
-        throw new Error(`Git checkout failed: ${checkoutOutput.stderr}`);
+      throw new Error(`Git checkout failed: ${checkoutOutput.stderr}`);
     }
   }
 }

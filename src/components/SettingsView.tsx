@@ -22,7 +22,12 @@ export function SettingsView() {
           type={focusedField === "clickup_pat" ? "text" : "password"}
           className={styles.input}
           value={settings.value.clickup_pat}
-          onInput={(e) => settings.value = { ...settings.value, clickup_pat: (e.target as HTMLInputElement).value }}
+          onInput={(e) =>
+            (settings.value = {
+              ...settings.value,
+              clickup_pat: (e.target as HTMLInputElement).value,
+            })
+          }
           onFocus={() => setFocusedField("clickup_pat")}
           onBlur={() => setFocusedField(null)}
           placeholder="pk_..."
@@ -35,14 +40,21 @@ export function SettingsView() {
           type={focusedField === "jules_api_key" ? "text" : "password"}
           className={styles.input}
           value={settings.value.jules_api_key}
-          onInput={(e) => settings.value = { ...settings.value, jules_api_key: (e.target as HTMLInputElement).value }}
+          onInput={(e) =>
+            (settings.value = {
+              ...settings.value,
+              jules_api_key: (e.target as HTMLInputElement).value,
+            })
+          }
           onFocus={() => setFocusedField("jules_api_key")}
           onBlur={() => setFocusedField(null)}
           placeholder="AI..."
         />
       </div>
 
-      <button className={styles.saveButton} onClick={saveSettings}>Save and Continue</button>
+      <button className={styles.saveButton} onClick={saveSettings}>
+        Save and Continue
+      </button>
     </div>
   );
 }

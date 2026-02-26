@@ -40,7 +40,7 @@ export interface Task {
   url: string;
 }
 
-export type SessionStatus = 'active' | 'paused' | 'archived';
+export type SessionStatus = "active" | "paused" | "archived";
 
 export interface JulesSession {
   sessionId: string;

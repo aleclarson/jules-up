@@ -1,6 +1,6 @@
-import useSWR from 'swr';
-import { clickupService } from '../services/clickup';
-import { Space, List, Task } from '../types';
+import useSWR from "swr";
+import { clickupService } from "../services/clickup";
+import { Space, List, Task } from "../types";
 
 const SWR_CONFIG = {
   refreshInterval: 5000,
@@ -10,9 +10,9 @@ const SWR_CONFIG = {
 
 export function useSpaces() {
   const { data, error, isLoading } = useSWR<Space[]>(
-    'spaces',
+    "spaces",
     () => clickupService.getSpaces(),
-    SWR_CONFIG
+    SWR_CONFIG,
   );
 
   return {
@@ -25,8 +25,8 @@ export function useSpaces() {
 export function useLists(spaceId: string | null) {
   const { data, error, isLoading } = useSWR<List[]>(
     spaceId ? `lists-${spaceId}` : null,
-    () => spaceId ? clickupService.getLists(spaceId) : Promise.resolve([]),
-    SWR_CONFIG
+    () => (spaceId ? clickupService.getLists(spaceId) : Promise.resolve([])),
+    SWR_CONFIG,
   );
 
   return {
@@ -39,8 +39,8 @@ export function useLists(spaceId: string | null) {
 export function useTasks(listId: string | null) {
   const { data, error, isLoading } = useSWR<Task[]>(
     listId ? `tasks-${listId}` : null,
-    () => listId ? clickupService.getTasks(listId) : Promise.resolve([]),
-    SWR_CONFIG
+    () => (listId ? clickupService.getTasks(listId) : Promise.resolve([])),
+    SWR_CONFIG,
   );
 
   return {

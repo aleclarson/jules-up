@@ -2,7 +2,12 @@ import { useState } from "preact/hooks";
 import { Task } from "../types";
 import { julesService } from "../services/jules";
 import { storeService } from "../services/store";
-import { activeSession, repoMappings, selectedSpaceId, julesSessions } from "../state";
+import {
+  activeSession,
+  repoMappings,
+  selectedSpaceId,
+  julesSessions,
+} from "../state";
 import styles from "./JulesPromptModal.module.css";
 import { JulesSession } from "../types";
 
@@ -19,12 +24,17 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
     const repoPath = spaceId ? repoMappings.value[spaceId] : null;
 
     if (!repoPath) {
-      alert("No repository mapped for this space. Please map a repo in the Spaces view first.");
+      alert(
+        "No repository mapped for this space. Please map a repo in the Spaces view first.",
+      );
       return;
     }
 
     // 1. Create session
-    const sessionResponse = await julesService.createSession(prompt, { taskId: task.id, repoPath });
+    const sessionResponse = await julesService.createSession(prompt, {
+      taskId: task.id,
+      repoPath,
+    });
 
     const newSession: JulesSession = {
       sessionId: sessionResponse.sessionId,
@@ -56,8 +66,12 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
           onInput={(e) => setPrompt((e.target as HTMLTextAreaElement).value)}
         />
         <div className={styles.actions}>
-          <button onClick={onClose} className={styles.cancelButton}>Cancel</button>
-          <button onClick={handleDelegate} className={styles.delegateButton}>Delegate</button>
+          <button onClick={onClose} className={styles.cancelButton}>
+            Cancel
+          </button>
+          <button onClick={handleDelegate} className={styles.delegateButton}>
+            Delegate
+          </button>
         </div>
       </div>
     </div>

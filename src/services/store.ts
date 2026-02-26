@@ -45,7 +45,9 @@ export class StoreService {
 
   async getActiveJulesSessions(): Promise<ActiveJulesSessions> {
     const store = await this.storePromise;
-    return (await store.get<ActiveJulesSessions>("active_jules_sessions")) || {};
+    return (
+      (await store.get<ActiveJulesSessions>("active_jules_sessions")) || {}
+    );
   }
 
   async setActiveJulesSessions(sessions: ActiveJulesSessions): Promise<void> {
@@ -55,8 +57,8 @@ export class StoreService {
   }
 
   async getSession(taskId: string): Promise<JulesSession | null> {
-      const sessions = await this.getActiveJulesSessions();
-      return sessions[taskId] || null;
+    const sessions = await this.getActiveJulesSessions();
+    return sessions[taskId] || null;
   }
 
   async get<T>(key: string): Promise<T | null> {

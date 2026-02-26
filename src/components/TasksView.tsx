@@ -44,9 +44,11 @@ function formatDescription(description: string) {
 
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    new Set(),
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<'tasks' | 'jules'>('tasks');
+  const [viewMode, setViewMode] = useState<"tasks" | "jules">("tasks");
 
   const toggleGroup = (title: string) => {
     const newCollapsed = new Set(collapsedGroups);
@@ -71,32 +73,39 @@ export function TasksView() {
   const displayedTasks = useMemo(() => {
     let baseTasks = tasks;
     if (searchQuery) {
-       baseTasks = fuse.search(searchQuery).map(r => r.item);
+      baseTasks = fuse.search(searchQuery).map((r) => r.item);
     }
 
-    if (viewMode === 'tasks') {
-       // Filter out closed tasks and "active" status tasks
-       return baseTasks.filter(t =>
-         t.status.type !== "closed" &&
-         t.status.status.toLowerCase() !== 'active'
-       );
+    if (viewMode === "tasks") {
+      // Filter out closed tasks and "active" status tasks
+      return baseTasks.filter(
+        (t) =>
+          t.status.type !== "closed" &&
+          t.status.status.toLowerCase() !== "active",
+      );
     } else {
-       // Jules Mode: Filter tasks with active sessions and PR links
-       return baseTasks.filter(t => {
+      // Jules Mode: Filter tasks with active sessions and PR links
+      return baseTasks
+        .filter((t) => {
           const session = julesSessions.value[t.id];
           return session && session.prLink;
-       }).sort((a, b) => {
+        })
+        .sort((a, b) => {
           const sessionA = julesSessions.value[a.id];
           const sessionB = julesSessions.value[b.id];
-          const timeA = sessionA?.lastActivity ? new Date(sessionA.lastActivity).getTime() : 0;
-          const timeB = sessionB?.lastActivity ? new Date(sessionB.lastActivity).getTime() : 0;
+          const timeA = sessionA?.lastActivity
+            ? new Date(sessionA.lastActivity).getTime()
+            : 0;
+          const timeB = sessionB?.lastActivity
+            ? new Date(sessionB.lastActivity).getTime()
+            : 0;
           return timeB - timeA;
-       });
+        });
     }
   }, [tasks, searchQuery, viewMode, julesSessions.value]); // Depend on julesSessions.value
 
   const groups = useMemo(() => {
-    if (viewMode === 'tasks') {
+    if (viewMode === "tasks") {
       return getTaskGroups(displayedTasks);
     }
     return [];
@@ -106,21 +115,21 @@ export function TasksView() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.headerContent}>
-            <h2 className={styles.title}>Tasks</h2>
-            <div className={styles.tabs}>
-                <button
-                    className={`${styles.tab} ${viewMode === 'tasks' ? styles.activeTab : ''}`}
-                    onClick={() => setViewMode('tasks')}
-                >
-                    List
-                </button>
-                <button
-                    className={`${styles.tab} ${viewMode === 'jules' ? styles.activeTab : ''}`}
-                    onClick={() => setViewMode('jules')}
-                >
-                    Jules
-                </button>
-            </div>
+          <h2 className={styles.title}>Tasks</h2>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${viewMode === "tasks" ? styles.activeTab : ""}`}
+              onClick={() => setViewMode("tasks")}
+            >
+              List
+            </button>
+            <button
+              className={`${styles.tab} ${viewMode === "jules" ? styles.activeTab : ""}`}
+              onClick={() => setViewMode("jules")}
+            >
+              Jules
+            </button>
+          </div>
         </div>
       </div>
 
@@ -131,37 +140,47 @@ export function TasksView() {
         value={searchQuery}
         onInput={(e) => setSearchQuery(e.currentTarget.value)}
       />
-      
+
       {isLoading && tasks.length === 0 ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
+        <div
+          style={{ display: "flex", justifyContent: "center", padding: "3rem" }}
+        >
           <div className="loading-spinner"></div>
         </div>
       ) : isError ? (
-         <div className="emptyState">
+        <div className="emptyState">
           <p>Error loading tasks.</p>
         </div>
       ) : displayedTasks.length === 0 ? (
         <div className="emptyState">
           <div className="emptyIcon">∅</div>
-          <p>{searchQuery ? "No matching tasks found." : (viewMode === 'jules' ? "No tasks with open PRs found." : "No tasks found in this list.")}</p>
+          <p>
+            {searchQuery
+              ? "No matching tasks found."
+              : viewMode === "jules"
+                ? "No tasks with open PRs found."
+                : "No tasks found in this list."}
+          </p>
         </div>
       ) : (
         <div>
-          {viewMode === 'tasks' ? (
+          {viewMode === "tasks" ? (
             groups.map((group) => (
-              <div key={group.title} style={{ marginBottom: '2rem' }}>
+              <div key={group.title} style={{ marginBottom: "2rem" }}>
                 <h3
                   className={styles.groupHeader}
                   onClick={() => toggleGroup(group.title)}
                   style={{
                     color: group.color,
                     borderBottom: `2px solid ${group.color}`,
-                    paddingBottom: '0.5rem',
-                    marginBottom: '1rem'
+                    paddingBottom: "0.5rem",
+                    marginBottom: "1rem",
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span className={`${styles.chevron} ${collapsedGroups.has(group.title) ? styles.collapsed : ''}`}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span
+                      className={`${styles.chevron} ${collapsedGroups.has(group.title) ? styles.collapsed : ""}`}
+                    >
                       ▼
                     </span>
                     {group.title}
@@ -170,7 +189,11 @@ export function TasksView() {
                 {!collapsedGroups.has(group.title) && (
                   <ul className={styles.taskList}>
                     {group.tasks.map((task) => (
-                      <TaskItem key={task.id} task={task} onDelegate={setSelectedTask} />
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelegate={setSelectedTask}
+                      />
                     ))}
                   </ul>
                 )}
@@ -178,9 +201,14 @@ export function TasksView() {
             ))
           ) : (
             <ul className={styles.taskList}>
-                {displayedTasks.map((task) => (
-                    <TaskItem key={task.id} task={task} onDelegate={setSelectedTask} isJulesView={true} />
-                ))}
+              {displayedTasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onDelegate={setSelectedTask}
+                  isJulesView={true}
+                />
+              ))}
             </ul>
           )}
         </div>
@@ -196,43 +224,61 @@ export function TasksView() {
   );
 }
 
-function TaskItem({ task, onDelegate, isJulesView = false }: { task: Task; onDelegate: (t: Task) => void; isJulesView?: boolean }) {
-    const session = julesSessions.value[task.id];
-    const isWorking = session?.status === 'active';
+function TaskItem({
+  task,
+  onDelegate,
+  isJulesView = false,
+}: {
+  task: Task;
+  onDelegate: (t: Task) => void;
+  isJulesView?: boolean;
+}) {
+  const session = julesSessions.value[task.id];
+  const isWorking = session?.status === "active";
 
-    return (
-        <li className={styles.taskItem}>
-            <div className={styles.taskHeader}>
-            <h3 className={styles.taskTitle}>{task.name}</h3>
-            <span className={styles.statusBadge}>{task.status.status}</span>
-            </div>
-            <p className={`${styles.description} ${!task.description ? styles.placeholder : ''}`}>
-            {formatDescription(task.description)}
-            </p>
-            <div className={styles.taskFooter}>
-            {isJulesView && session?.prLink && (
-                <div className={styles.prLink}>
-                    <span className={styles.prIcon}>🔗</span>
-                    <a href={session.prLink} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.preventDefault(); openUrl(session.prLink!); }}>
-                        Pull Request
-                    </a>
-                </div>
-            )}
+  return (
+    <li className={styles.taskItem}>
+      <div className={styles.taskHeader}>
+        <h3 className={styles.taskTitle}>{task.name}</h3>
+        <span className={styles.statusBadge}>{task.status.status}</span>
+      </div>
+      <p
+        className={`${styles.description} ${!task.description ? styles.placeholder : ""}`}
+      >
+        {formatDescription(task.description)}
+      </p>
+      <div className={styles.taskFooter}>
+        {isJulesView && session?.prLink && (
+          <div className={styles.prLink}>
+            <span className={styles.prIcon}>🔗</span>
+            <a
+              href={session.prLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                openUrl(session.prLink!);
+              }}
+            >
+              Pull Request
+            </a>
+          </div>
+        )}
 
-            <button className={styles.openButton} onClick={() => openUrl(task.url)}>
-                Open in ClickUp
-            </button>
-            {isWorking ? (
-                <div className={styles.workingLabel}>Jules is working on this...</div>
-            ) : (
-                <button
-                className={styles.delegateButton}
-                onClick={() => onDelegate(task)}
-                >
-                Delegate to Jules
-                </button>
-            )}
-            </div>
-        </li>
-    );
+        <button className={styles.openButton} onClick={() => openUrl(task.url)}>
+          Open in ClickUp
+        </button>
+        {isWorking ? (
+          <div className={styles.workingLabel}>Jules is working on this...</div>
+        ) : (
+          <button
+            className={styles.delegateButton}
+            onClick={() => onDelegate(task)}
+          >
+            Delegate to Jules
+          </button>
+        )}
+      </div>
+    </li>
+  );
 }

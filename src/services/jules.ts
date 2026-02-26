@@ -23,7 +23,8 @@ export class JulesService {
         sourceContext,
       }),
     });
-    if (!response.ok) throw new Error(`Failed to create session: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(`Failed to create session: ${response.statusText}`);
     return await response.json();
   }
 
@@ -32,35 +33,48 @@ export class JulesService {
       method: "GET",
       headers: await this.getHeaders(),
     });
-    if (!response.ok) throw new Error(`Failed to get session: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(`Failed to get session: ${response.statusText}`);
     return await response.json();
   }
 
   async sendMessage(sessionId: string, message: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}:sendMessage`, {
-      method: "POST",
-      headers: await this.getHeaders(),
-      body: JSON.stringify({ message }),
-    });
-    if (!response.ok) throw new Error(`Failed to send message: ${response.statusText}`);
+    const response = await fetch(
+      `${API_BASE}/sessions/${sessionId}:sendMessage`,
+      {
+        method: "POST",
+        headers: await this.getHeaders(),
+        body: JSON.stringify({ message }),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Failed to send message: ${response.statusText}`);
   }
 
   async listActivities(sessionId: string): Promise<Activity[]> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}/activities`, {
-      method: "GET",
-      headers: await this.getHeaders(),
-    });
-    if (!response.ok) throw new Error(`Failed to list activities: ${response.statusText}`);
+    const response = await fetch(
+      `${API_BASE}/sessions/${sessionId}/activities`,
+      {
+        method: "GET",
+        headers: await this.getHeaders(),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Failed to list activities: ${response.statusText}`);
     const data = await response.json();
     return data.activities;
   }
 
   async approvePlan(sessionId: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}:approvePlan`, {
-      method: "POST",
-      headers: await this.getHeaders(),
-    });
-    if (!response.ok) throw new Error(`Failed to approve plan: ${response.statusText}`);
+    const response = await fetch(
+      `${API_BASE}/sessions/${sessionId}:approvePlan`,
+      {
+        method: "POST",
+        headers: await this.getHeaders(),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Failed to approve plan: ${response.statusText}`);
   }
 }
 

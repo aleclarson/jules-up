@@ -11,7 +11,9 @@ export function SessionControls() {
   useEffect(() => {
     const fetchActivities = async () => {
       if (activeSession.value) {
-        const newActivities = await julesService.listActivities(activeSession.value.sessionId);
+        const newActivities = await julesService.listActivities(
+          activeSession.value.sessionId,
+        );
         setActivities(newActivities);
       }
     };
@@ -47,19 +49,32 @@ export function SessionControls() {
 
       <div className={styles.activitiesContainer}>
         <div className={styles.activitiesHeader}>Latest Activities</div>
-        {activities.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>Waiting for Jules...</p>}
+        {activities.length === 0 && (
+          <p style={{ color: "var(--text-secondary)" }}>Waiting for Jules...</p>
+        )}
         {activities.map((a, i) => (
           <div key={i} className={styles.activityLine}>
-            <span className={styles.timestamp}>[{new Date(a.timestamp).toLocaleTimeString()}]</span> 
-            <strong>{a.type}</strong>: {typeof a.details === 'string' ? a.details : JSON.stringify(a.details)}
+            <span className={styles.timestamp}>
+              [{new Date(a.timestamp).toLocaleTimeString()}]
+            </span>
+            <strong>{a.type}</strong>:{" "}
+            {typeof a.details === "string"
+              ? a.details
+              : JSON.stringify(a.details)}
           </div>
         ))}
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.approveButton} onClick={handleApprove}>Approve Plan</button>
-        <button className={styles.checkoutButton} onClick={handleCheckout}>Checkout PR Branch</button>
-        <button className={styles.archiveButton} onClick={handleArchive}>Archive Session</button>
+        <button className={styles.approveButton} onClick={handleApprove}>
+          Approve Plan
+        </button>
+        <button className={styles.checkoutButton} onClick={handleCheckout}>
+          Checkout PR Branch
+        </button>
+        <button className={styles.archiveButton} onClick={handleArchive}>
+          Archive Session
+        </button>
       </div>
     </div>
   );
