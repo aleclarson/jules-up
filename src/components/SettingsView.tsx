@@ -9,13 +9,13 @@ export function SettingsView() {
 
   const handleSave = async () => {
     // 1. Update Global State
-    await saveSettings(localSettings);
+    saveSettings(localSettings);
     // 2. Persist to Store
     await storeService.setClickUpPat(localSettings.clickup_pat);
     await storeService.setJulesApiKey(localSettings.jules_api_key);
 
     alert("Settings saved!");
-    await navigateTo("welcome");
+    navigateTo("welcome");
   };
 
   return (

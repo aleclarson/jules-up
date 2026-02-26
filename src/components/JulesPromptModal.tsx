@@ -39,10 +39,10 @@ export function JulesPromptModal({ task, onClose }: JulesPromptModalProps) {
     };
 
     // 2. Update active session state
-    await startActiveSession(newSession);
+    startActiveSession(newSession);
 
     // 3. Persist session
-    await registerJulesSession(newSession);
+    registerJulesSession(newSession);
     const updatedSessions = { ...julesSessions.value, [task.id]: newSession };
     await storeService.setActiveJulesSessions(updatedSessions);
 

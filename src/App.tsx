@@ -21,19 +21,19 @@ function App() {
       const mappings = await storeService.getSpaceRepoMappings();
       const sessions = await storeService.getActiveJulesSessions();
 
-      await initializeSettings({
+      initializeSettings({
         clickup_pat: pat || "",
         jules_api_key: apiKey || "",
       });
-      await loadRepoMappings(mappings);
-      await loadJulesSessions(sessions);
+      loadRepoMappings(mappings);
+      loadJulesSessions(sessions);
 
       if (pat && apiKey) {
-        await navigateTo("welcome");
+        navigateTo("welcome");
         setShowToast(true);
         setTimeout(() => setShowToast(false), 2000);
       } else {
-        await navigateTo("settings");
+        navigateTo("settings");
       }
       setIsInitialized(true);
     };

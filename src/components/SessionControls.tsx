@@ -38,8 +38,8 @@ export function SessionControls() {
     }
   };
 
-  const handleArchive = async () => {
-    await clearActiveSession();
+  const handleArchive = () => {
+    clearActiveSession();
   };
 
   return (

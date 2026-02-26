@@ -19,7 +19,7 @@ function SpaceItem({ space }: { space: Space }) {
     e.stopPropagation();
     const repoPath = await gitService.selectRepoDirectory();
     if (repoPath) {
-      await mapSpaceToRepo(space.id, repoPath);
+      mapSpaceToRepo(space.id, repoPath);
       // We need to get the latest value for persistence since state updates might be async or batched,
       // but here we can just construct it or read from the updated signal if we trust it's synchronous enough.
       // However, to be safe and cleaner, we should probably let the effect or store service handle it.
@@ -29,10 +29,10 @@ function SpaceItem({ space }: { space: Space }) {
     }
   };
 
-  const handleSelectList = async (listId: string) => {
-    await selectList(listId);
-    await selectSpace(space.id);
-    await navigateTo("tasks");
+  const handleSelectList = (listId: string) => {
+    selectList(listId);
+    selectSpace(space.id);
+    navigateTo("tasks");
   };
 
   return (

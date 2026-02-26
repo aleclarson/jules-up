@@ -35,51 +35,51 @@ export const julesSessions = signal<ActiveJulesSessions>({});
 export const repoMappings = signal<SpaceRepoMapping>({});
 
 // Mutation functions
-export async function navigateTo(view: View) {
+export function navigateTo(view: View) {
   currentView.value = view;
 }
 
-export async function selectSpace(id: string | null) {
+export function selectSpace(id: string | null) {
   selectedSpaceId.value = id;
 }
 
-export async function selectList(id: string | null) {
+export function selectList(id: string | null) {
   selectedListId.value = id;
 }
 
-export async function initializeSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
+export function initializeSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
   settings.value = newSettings;
 }
 
-export async function saveSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
+export function saveSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
     settings.value = newSettings;
 }
 
-export async function clearActiveSession() {
+export function clearActiveSession() {
   activeSession.value = null;
 }
 
-export async function startActiveSession(session: JulesSession) {
+export function startActiveSession(session: JulesSession) {
   activeSession.value = session;
 }
 
-export async function loadJulesSessions(sessions: ActiveJulesSessions) {
+export function loadJulesSessions(sessions: ActiveJulesSessions) {
   julesSessions.value = sessions;
 }
 
-export async function registerJulesSession(session: JulesSession) {
+export function registerJulesSession(session: JulesSession) {
   julesSessions.value = { ...julesSessions.value, [session.taskId]: session };
 }
 
-export async function loadRepoMappings(mappings: SpaceRepoMapping) {
+export function loadRepoMappings(mappings: SpaceRepoMapping) {
   repoMappings.value = mappings;
 }
 
-export async function mapSpaceToRepo(spaceId: string, path: string) {
+export function mapSpaceToRepo(spaceId: string, path: string) {
   repoMappings.value = { ...repoMappings.value, [spaceId]: path };
 }
 
-export async function updateSessionPrLink(taskId: string, prUrl: string) {
+export function updateSessionPrLink(taskId: string, prUrl: string) {
   const session = julesSessions.value[taskId];
   if (session) {
     const updatedSession = { ...session, prLink: prUrl };
