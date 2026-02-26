@@ -1,16 +1,21 @@
 import { useState } from "preact/hooks";
 import { storeService } from "../services/store";
-import { settings, setClickUpPat, setJulesApiKey, setCurrentView } from "../state";
+import { settings, saveSettings, navigateTo } from "../state";
 import styles from "./SettingsView.module.css";
 
 export function SettingsView() {
+  const [localSettings, setLocalSettings] = useState(settings.value);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const saveSettings = async () => {
-    await storeService.setClickUpPat(settings.value.clickup_pat);
-    await storeService.setJulesApiKey(settings.value.jules_api_key);
+  const handleSave = async () => {
+    // 1. Update Global State
+    await saveSettings(localSettings);
+    // 2. Persist to Store
+    await storeService.setClickUpPat(localSettings.clickup_pat);
+    await storeService.setJulesApiKey(localSettings.jules_api_key);
+
     alert("Settings saved!");
-    setCurrentView("welcome");
+    await navigateTo("welcome");
   };
 
   return (
@@ -21,8 +26,8 @@ export function SettingsView() {
         <input
           type={focusedField === "clickup_pat" ? "text" : "password"}
           className={styles.input}
-          value={settings.value.clickup_pat}
-          onInput={(e) => setClickUpPat((e.target as HTMLInputElement).value)}
+          value={localSettings.clickup_pat}
+          onInput={(e) => setLocalSettings({ ...localSettings, clickup_pat: (e.target as HTMLInputElement).value })}
           onFocus={() => setFocusedField("clickup_pat")}
           onBlur={() => setFocusedField(null)}
           placeholder="pk_..."
@@ -34,17 +39,15 @@ export function SettingsView() {
         <input
           type={focusedField === "jules_api_key" ? "text" : "password"}
           className={styles.input}
-          value={settings.value.jules_api_key}
-          onInput={(e) => setJulesApiKey((e.target as HTMLInputElement).value)}
+          value={localSettings.jules_api_key}
+          onInput={(e) => setLocalSettings({ ...localSettings, jules_api_key: (e.target as HTMLInputElement).value })}
           onFocus={() => setFocusedField("jules_api_key")}
           onBlur={() => setFocusedField(null)}
           placeholder="AI..."
         />
       </div>
 
-      <button className={styles.saveButton} onClick={saveSettings}>
-        Save and Continue
-      </button>
+      <button className={styles.saveButton} onClick={handleSave}>Save and Continue</button>
     </div>
   );
 }

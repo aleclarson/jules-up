@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { gitService } from "../services/git";
 import { storeService } from "../services/store";
-import { selectedListId, repoMappings, addRepoMapping, setSelectedListId, setSelectedSpaceId, setCurrentView } from "../state";
+import { selectedListId, repoMappings, mapSpaceToRepo, selectList, selectSpace, navigateTo } from "../state";
 import { useSpaces, useLists } from "../hooks/useClickUp";
 import styles from "./Sidebar.module.css";
 import { Space } from "../types";
@@ -19,7 +19,7 @@ function SpaceItem({ space }: { space: Space }) {
     e.stopPropagation();
     const repoPath = await gitService.selectRepoDirectory();
     if (repoPath) {
-      addRepoMapping(space.id, repoPath);
+      await mapSpaceToRepo(space.id, repoPath);
       // We need to get the latest value for persistence since state updates might be async or batched,
       // but here we can just construct it or read from the updated signal if we trust it's synchronous enough.
       // However, to be safe and cleaner, we should probably let the effect or store service handle it.
@@ -29,10 +29,10 @@ function SpaceItem({ space }: { space: Space }) {
     }
   };
 
-  const selectList = (listId: string) => {
-    setSelectedListId(listId);
-    setSelectedSpaceId(space.id);
-    setCurrentView("tasks");
+  const handleSelectList = async (listId: string) => {
+    await selectList(listId);
+    await selectSpace(space.id);
+    await navigateTo("tasks");
   };
 
   return (
@@ -89,8 +89,8 @@ function SpaceItem({ space }: { space: Space }) {
             lists.map((list) => (
               <div
                 key={list.id}
-                className={`${styles.listItem} ${selectedListId.value === list.id ? styles.listItemSelected : ""}`}
-                onClick={() => selectList(list.id)}
+                className={`${styles.listItem} ${selectedListId.value === list.id ? styles.listItemSelected : ''}`}
+                onClick={() => handleSelectList(list.id)}
               >
                 {list.name}
               </div>
@@ -129,7 +129,7 @@ export function Sidebar() {
       <div className={styles.footer}>
         <button
           className={styles.settingsButton}
-          onClick={() => setCurrentView("settings")}
+          onClick={() => navigateTo("settings")}
         >
           ⚙️ Settings
         </button>

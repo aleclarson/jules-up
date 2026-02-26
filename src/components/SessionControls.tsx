@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Activity } from "../types";
 import { julesService } from "../services/jules";
 import { gitService } from "../services/git";
-import { activeSession, repoMappings, selectedSpaceId, setActiveSession } from "../state";
+import { activeSession, repoMappings, selectedSpaceId, clearActiveSession } from "../state";
 import styles from "./SessionControls.module.css";
 
 export function SessionControls() {
@@ -38,8 +38,8 @@ export function SessionControls() {
     }
   };
 
-  const handleArchive = () => {
-    setActiveSession(null);
+  const handleArchive = async () => {
+    await clearActiveSession();
   };
 
   return (

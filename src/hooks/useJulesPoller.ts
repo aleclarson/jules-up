@@ -26,7 +26,7 @@ export function useJulesPoller() {
           const prUrl = remoteSession.outputs?.pullRequest?.url;
           if (prUrl) {
              // Update state
-             updateSessionPrLink(session.taskId, prUrl);
+             await updateSessionPrLink(session.taskId, prUrl);
 
              // Persist the updated state.
              // Note: updateSessionPrLink updates the signal.
