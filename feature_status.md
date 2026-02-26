@@ -6,10 +6,11 @@
 **What's Done:**
 - The data structure `JulesSession` includes a `prLink` field to store the GitHub PR URL.
 - The `JulesPromptModal` component allows users to delegate a task to Jules, which initiates a session via `julesService`.
+- The Google Jules API supports retrieving PR details via the `outputs` field in session details.
 
 **What's Left to Do:**
 - **Persistence:** The created session is only stored in the transient `activeSession` signal and is lost on application reload. It needs to be persisted using `StoreService`.
-- **PR Link Retrieval:** There is currently no mechanism to retrieve the GitHub PR link from the Jules backend once it is created. The application needs to poll or receive updates from the Jules API to populate the `prLink` field in the session.
+- **PR Link Retrieval:** There is currently no mechanism to retrieve the GitHub PR link from the Jules backend once it is created. The application needs to implement the `GetSession` endpoint (`/v1alpha/sessions/{sessionId}`) to poll for updates. The GitHub PR URL should be extracted from the `outputs.pullRequest.url` field in the session details once the session is complete.
 - **Association:** The link between the task and the PR is not permanently stored or updated in the application state beyond the initial session creation.
 
 ## 2. Jules Tab
