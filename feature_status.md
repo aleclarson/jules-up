@@ -20,8 +20,8 @@
 - None. There is no "Jules" tab or view in the current application.
 
 **What's Left to Do:**
-- **UI Implementation:** Add a "Jules" tab to the `Sidebar` and implement navigation in `App.tsx` to switch to this view.
-- **View Component:** Create a `JulesView` (or similar) component to display the list of tasks.
+- **UI Implementation:** Add a "Jules" tab button next to the "Tasks" heading in the `TasksView` component. This tab should be list-specific, allowing the user to switch between the regular task list and the Jules-managed task list for the currently selected list.
+- **View Component:** Create a `JulesView` (or similar) component (or a filtered mode within `TasksView`) to display the list of tasks.
 - **Filtering Logic:** Implement logic to filter tasks that have an associated, active Jules session with an unmerged/unclosed GitHub PR.
 - **Sorting:** Implement sorting logic to order these tasks by "most recently updated".
 - **GitHub Integration:** Implement logic (likely via `JulesService` or a new `GitHubService`) to check the status of the PR (open/merged/closed) to ensure only relevant tasks are shown.
