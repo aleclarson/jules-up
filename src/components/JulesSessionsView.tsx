@@ -1,4 +1,4 @@
-import { useMemo } from "preact/hooks";
+import { useState, useMemo } from "preact/hooks";
 import useSWR from "swr";
 import { julesSessions } from "../state";
 import { clickupService } from "../services/clickup";
@@ -42,8 +42,9 @@ const fetchSessionDetails = async (session: JulesSession) => {
 function useSessionDetails() {
     const sessions = julesSessions.value;
     const sessionIds = Object.keys(sessions);
+    const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
-    const { data, error, isLoading } = useSWR(
+    const { data, error, isLoading, isValidating } = useSWR(
         ['jules-session-details', ...sessionIds], // Re-fetch when session keys change
         async () => {
             const results = await Promise.all(Object.values(sessions).map(fetchSessionDetails));
@@ -51,19 +52,22 @@ function useSessionDetails() {
         },
         {
             refreshInterval: 10000, // Refresh every 10s
-            revalidateOnFocus: true
+            revalidateOnFocus: true,
+            onSuccess: () => setLastRefreshed(new Date())
         }
     );
 
     return {
         detailedSessions: data || [],
         isLoading,
+        isValidating,
+        lastRefreshed,
         isError: error
     };
 }
 
 export function JulesSessionsView() {
-    const { detailedSessions, isLoading } = useSessionDetails();
+    const { detailedSessions, isLoading, isValidating, lastRefreshed } = useSessionDetails();
 
     // Filter sessions
     const filteredSessions = useMemo(() => {
@@ -132,6 +136,12 @@ export function JulesSessionsView() {
             <h2 className={styles.title}>Jules Sessions</h2>
             <div className={styles.subtitle}>
                 Managing {filteredSessions.length} active sessions
+                {lastRefreshed && (
+                    <span style={{ marginLeft: '1rem', fontSize: '0.8rem', opacity: 0.8 }}>
+                        Last refreshed: {lastRefreshed.toLocaleTimeString()}
+                        {isValidating && " (Refreshing...)"}
+                    </span>
+                )}
             </div>
 
             {isLoading && filteredSessions.length === 0 ? (
