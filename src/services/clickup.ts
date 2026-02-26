@@ -1,4 +1,4 @@
-import { fetch } from "@tauri-apps/plugin-http";
+import { fetchWithLogging } from "./http";
 import { storeService } from "./store";
 import { Space, List, Task, User } from "../types";
 
@@ -15,7 +15,7 @@ export class ClickUpService {
   }
 
   async getUser(): Promise<User> {
-    const response = await fetch(`${API_BASE}/user`, {
+    const response = await fetchWithLogging(`${API_BASE}/user`, {
       method: 'GET',
       headers: await this.getHeaders(),
     });
@@ -26,7 +26,7 @@ export class ClickUpService {
 
   async getTeams(): Promise<any[]> {
     try {
-      const response = await fetch(`${API_BASE}/team`, {
+      const response = await fetchWithLogging(`${API_BASE}/team`, {
         method: 'GET',
         headers: await this.getHeaders(),
       });
@@ -49,7 +49,7 @@ export class ClickUpService {
     let allSpaces: Space[] = [];
 
     for (const team of teams) {
-      const response = await fetch(`${API_BASE}/team/${team.id}/space?archived=false`, {
+      const response = await fetchWithLogging(`${API_BASE}/team/${team.id}/space?archived=false`, {
         method: 'GET',
         headers: await this.getHeaders(),
       });
@@ -69,7 +69,7 @@ export class ClickUpService {
     let lists: List[] = [];
 
     // 1. Fetch folderless lists
-    const listsResponse = await fetch(`${API_BASE}/space/${spaceId}/list?archived=false`, {
+    const listsResponse = await fetchWithLogging(`${API_BASE}/space/${spaceId}/list?archived=false`, {
       method: 'GET',
       headers,
     });
@@ -79,7 +79,7 @@ export class ClickUpService {
     }
 
     // 2. Fetch folders
-    const foldersResponse = await fetch(`${API_BASE}/space/${spaceId}/folder?archived=false`, {
+    const foldersResponse = await fetchWithLogging(`${API_BASE}/space/${spaceId}/folder?archived=false`, {
       method: 'GET',
       headers,
     });
@@ -91,7 +91,7 @@ export class ClickUpService {
       // 3. Fetch lists for each folder in parallel
       const folderListsPromises = folders.map(async (folder: any) => {
         try {
-          const res = await fetch(`${API_BASE}/folder/${folder.id}/list?archived=false`, {
+          const res = await fetchWithLogging(`${API_BASE}/folder/${folder.id}/list?archived=false`, {
             method: 'GET',
             headers
           });
@@ -116,7 +116,7 @@ export class ClickUpService {
   }
 
   async getTasks(listId: string): Promise<Task[]> {
-    const response = await fetch(`${API_BASE}/list/${listId}/task?archived=false`, {
+    const response = await fetchWithLogging(`${API_BASE}/list/${listId}/task?archived=false`, {
       method: 'GET',
       headers: await this.getHeaders(),
     });
@@ -130,7 +130,7 @@ export class ClickUpService {
     const userIdNum = parseInt(userId);
 
     // Update status and add assignee
-    const response = await fetch(`${API_BASE}/task/${taskId}`, {
+    const response = await fetchWithLogging(`${API_BASE}/task/${taskId}`, {
       method: "PUT",
       headers,
       body: JSON.stringify({

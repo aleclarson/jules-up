@@ -1,4 +1,4 @@
-import { fetch } from "@tauri-apps/plugin-http";
+import { fetchWithLogging } from "./http";
 import { storeService } from "./store";
 import { JulesSession, Activity } from "../types";
 
@@ -15,7 +15,7 @@ export class JulesService {
   }
 
   async createSession(prompt: string, sourceContext: any): Promise<JulesSession> {
-    const response = await fetch(`${API_BASE}/sessions`, {
+    const response = await fetchWithLogging(`${API_BASE}/sessions`, {
       method: "POST",
       headers: await this.getHeaders(),
       body: JSON.stringify({
@@ -28,7 +28,7 @@ export class JulesService {
   }
 
   async sendMessage(sessionId: string, message: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}:sendMessage`, {
+    const response = await fetchWithLogging(`${API_BASE}/sessions/${sessionId}:sendMessage`, {
       method: "POST",
       headers: await this.getHeaders(),
       body: JSON.stringify({ message }),
@@ -37,7 +37,7 @@ export class JulesService {
   }
 
   async listActivities(sessionId: string): Promise<Activity[]> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}/activities`, {
+    const response = await fetchWithLogging(`${API_BASE}/sessions/${sessionId}/activities`, {
       method: "GET",
       headers: await this.getHeaders(),
     });
@@ -47,7 +47,7 @@ export class JulesService {
   }
 
   async approvePlan(sessionId: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/sessions/${sessionId}:approvePlan`, {
+    const response = await fetchWithLogging(`${API_BASE}/sessions/${sessionId}:approvePlan`, {
       method: "POST",
       headers: await this.getHeaders(),
     });
