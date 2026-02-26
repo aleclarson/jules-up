@@ -14,7 +14,7 @@ export class JulesService {
     };
   }
 
-  async createSession(prompt: string, sourceContext: any): Promise<JulesSession> {
+  async createSession(prompt: string, sourceContext: any): Promise<any> {
     const response = await fetch(`${API_BASE}/sessions`, {
       method: "POST",
       headers: await this.getHeaders(),
@@ -24,6 +24,15 @@ export class JulesService {
       }),
     });
     if (!response.ok) throw new Error(`Failed to create session: ${response.statusText}`);
+    return await response.json();
+  }
+
+  async getSession(sessionId: string): Promise<any> {
+    const response = await fetch(`${API_BASE}/sessions/${sessionId}`, {
+      method: "GET",
+      headers: await this.getHeaders(),
+    });
+    if (!response.ok) throw new Error(`Failed to get session: ${response.statusText}`);
     return await response.json();
   }
 

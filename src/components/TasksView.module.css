@@ -10,6 +10,53 @@
   margin-bottom: 2rem;
 }
 
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  background-color: var(--surface-border);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.tab {
+  padding: 0.4rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.activeTab {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.activeTab:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
 .backButton {
   background: transparent;
   border: 1px solid var(--surface-border);
@@ -188,5 +235,18 @@
   width: 100%;
   margin-bottom: 1.5rem;
   padding: 0.8rem;
+  font-size: 1rem;
+}
+
+.prLink {
+  margin-right: auto;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.prIcon {
   font-size: 1rem;
 }
