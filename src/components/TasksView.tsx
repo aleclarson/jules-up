@@ -1,4 +1,5 @@
-import { useState } from "preact/hooks";
+import { useState, useMemo } from "preact/hooks";
+import Fuse from "fuse.js";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Task } from "../types";
 import { activeSession, selectedListId } from "../state";
@@ -39,6 +40,7 @@ function getTaskGroups(allTasks: Task[]) {
 export function TasksView() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleGroup = (title: string) => {
     const newCollapsed = new Set(collapsedGroups);
@@ -53,11 +55,31 @@ export function TasksView() {
   // Use SWR hook for tasks
   const { tasks, isLoading, isError } = useTasks(selectedListId.value);
 
-  const groups = getTaskGroups(tasks);
+  const fuse = useMemo(() => {
+    return new Fuse(tasks, {
+      keys: ["name", "description"],
+      threshold: 0.4,
+    });
+  }, [tasks]);
+
+  const filteredTasks = useMemo(() => {
+    if (!searchQuery) return tasks;
+    return fuse.search(searchQuery).map((result) => result.item);
+  }, [fuse, tasks, searchQuery]);
+
+  const groups = getTaskGroups(filteredTasks);
 
   return (
     <div className={styles.container}>
       <h2 style={{ marginBottom: '2rem' }}>Tasks</h2>
+
+      <input
+        type="text"
+        placeholder="Search tasks..."
+        className={styles.searchInput}
+        value={searchQuery}
+        onInput={(e) => setSearchQuery(e.currentTarget.value)}
+      />
       
       {isLoading && tasks.length === 0 ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
@@ -70,7 +92,7 @@ export function TasksView() {
       ) : groups.length === 0 ? (
         <div className="emptyState">
           <div className="emptyIcon">∅</div>
-          <p>No tasks found in this list.</p>
+          <p>{searchQuery ? "No matching tasks found." : "No tasks found in this list."}</p>
         </div>
       ) : (
         <div>

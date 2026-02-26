@@ -179,3 +179,10 @@
   color: #484f58;
   font-style: italic;
 }
+
+.searchInput {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 0.8rem;
+  font-size: 1rem;
+}
