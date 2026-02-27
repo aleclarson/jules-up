@@ -101,6 +101,15 @@ export function Sidebar() {
     <div className={styles.sidebar}>
       <div className={styles.header}>Jules</div>
 
+      <div className={styles.navSection}>
+        <button
+          className={`${styles.navItem} ${currentView.value === 'jules_sessions' ? styles.activeNavItem : ''}`}
+          onClick={() => currentView.value = 'jules_sessions'}
+        >
+          <span style={{ marginRight: '0.5rem' }}>🤖</span> Jules Sessions
+        </button>
+      </div>
+
       <div className={styles.spacesList}>
         {isLoadingSpaces && spaces.length === 0 ? (
           <div

@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { currentView, activeSession, initializeSettings, loadRepoMappings, loadJulesSessions, navigateTo } from "./state";
 import { SettingsView } from "./components/SettingsView";
 import { TasksView } from "./components/TasksView";
+import { JulesSessionsView } from "./components/JulesSessionsView";
 import { SessionControls } from "./components/SessionControls";
 import { Sidebar } from "./components/Sidebar";
 import { storeService } from "./services/store";
@@ -62,6 +63,8 @@ function App() {
         return <SettingsView />;
       case "tasks":
         return <TasksView />;
+      case "jules_sessions":
+        return <JulesSessionsView />;
       case "welcome":
       default:
         return (

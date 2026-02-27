@@ -34,6 +34,47 @@ export class GitService {
       throw new Error(`Git checkout failed: ${checkoutOutput.stderr}`);
     }
   }
+
+  async checkoutPr(repoPath: string, prUrl: string): Promise<void> {
+    // Basic validation to prevent command injection
+    if (!prUrl.match(/^https:\/\/github\.com\/[\w-]+\/[\w-]+\/pull\/\d+$/)) {
+        throw new Error("Invalid PR URL format");
+    }
+
+    const cmd = Command.create("exec-sh", ["-c", `gh pr checkout ${prUrl}`], {
+        cwd: repoPath
+    });
+    const output = await cmd.execute();
+    if (output.code !== 0) {
+        throw new Error(`Failed to checkout PR: ${output.stderr}`);
+    }
+  }
+
+  async getPrStatus(repoPath: string, prUrl: string): Promise<string> {
+    const cmd = Command.create("exec-sh", ["-c", `gh pr view ${prUrl} --json state --jq .state`], {
+        cwd: repoPath
+    });
+    const output = await cmd.execute();
+    if (output.code !== 0) {
+        throw new Error(`Failed to get PR status: ${output.stderr}`);
+    }
+    return output.stdout.trim();
+  }
+
+  async openInIde(path: string): Promise<void> {
+    // Try opening with code (VS Code) first
+    try {
+        const cmd = Command.create("exec-sh", ["-c", `code "${path}"`]);
+        const output = await cmd.execute();
+        if (output.code === 0) return;
+    } catch (e) {
+        console.warn("Failed to open with 'code', falling back to default opener", e);
+    }
+
+    // Fallback
+    const { openPath } = await import("@tauri-apps/plugin-opener");
+    await openPath(path);
+  }
 }
 
 export const gitService = new GitService();
