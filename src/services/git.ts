@@ -36,6 +36,11 @@ export class GitService {
   }
 
   async checkoutPr(repoPath: string, prUrl: string): Promise<void> {
+    // Basic validation to prevent command injection
+    if (!prUrl.match(/^https:\/\/github\.com\/[\w-]+\/[\w-]+\/pull\/\d+$/)) {
+        throw new Error("Invalid PR URL format");
+    }
+
     const cmd = Command.create("exec-sh", ["-c", `gh pr checkout ${prUrl}`], {
         cwd: repoPath
     });

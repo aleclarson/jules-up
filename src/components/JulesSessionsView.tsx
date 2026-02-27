@@ -1,6 +1,6 @@
 import { useState, useMemo } from "preact/hooks";
 import useSWR from "swr";
-import { julesSessions } from "../state";
+import { julesSessions, repoMappings } from "../state";
 import { clickupService } from "../services/clickup";
 import { gitService } from "../services/git";
 import { storeService } from "../services/store";
@@ -47,7 +47,15 @@ function useSessionDetails() {
     const { data, error, isLoading, isValidating } = useSWR(
         ['jules-session-details', ...sessionIds], // Re-fetch when session keys change
         async () => {
-            const results = await Promise.all(Object.values(sessions).map(fetchSessionDetails));
+            const sessionList = Object.values(sessions);
+            const results = [];
+
+            // Limit concurrency to 5
+            for (let i = 0; i < sessionList.length; i += 5) {
+                const chunk = sessionList.slice(i, i + 5);
+                const chunkResults = await Promise.all(chunk.map(fetchSessionDetails));
+                results.push(...chunkResults);
+            }
             return results;
         },
         {
@@ -81,17 +89,6 @@ export function JulesSessionsView() {
 
     const handleOpen = async (session: any) => {
         if (!session.repoPath) {
-             // Try to find if we have a mapping for this space
-             // We need to know the Space ID.
-             // Issue: Task object from `getTask` contains `project` (which is List) or `folder` or `space`.
-             // ClickUp API v2 Task payload:
-             // { "id": "...", "name": "...", ..., "space": { "id": "..." } }
-             // Let's verify if `fetchSessionDetails` can retrieve space id.
-             // If not, we might need to prompt user to select a space or just pick a folder.
-
-             // For now, let's assume we prompt the user to map a directory to this specific session if we can't determine space.
-             // OR simpler: Just ask to map a directory for this session's context.
-
              alert("Repository path is missing for this session.");
              await mapRepoForSession(session);
              return;
@@ -115,16 +112,20 @@ export function JulesSessionsView() {
     const mapRepoForSession = async (session: any) => {
          const selected = await gitService.selectRepoDirectory();
          if (selected) {
-             // Update session in store and state
-             // Note: This updates the individual session's repoPath.
-             // It does NOT update the global Space->Repo mapping unless we know the space ID.
-             // Ideally we should update the global mapping if possible, but updating the session is sufficient for this feature.
-
+             // 1. Update session in store and state
              const updatedSession = { ...julesSessions.value[session.taskId], repoPath: selected };
              const newSessions = { ...julesSessions.value, [session.taskId]: updatedSession };
 
              julesSessions.value = newSessions;
              await storeService.setActiveJulesSessions(newSessions);
+
+             // 2. Update global repoMappings if spaceId is available
+             // session object here comes from filteredSessions which has data from fetchSessionDetails, so it should have spaceId
+             if (session.spaceId) {
+                 const newMappings = { ...repoMappings.value, [session.spaceId]: selected };
+                 repoMappings.value = newMappings;
+                 await storeService.setSpaceRepoMappings(newMappings);
+             }
 
              // Retry open
              handleOpen({ ...session, repoPath: selected });
