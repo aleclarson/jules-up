@@ -26,7 +26,6 @@ function SpaceItem({ space }: { space: Space }) {
           <span className={styles.spaceName} title={space.name}>
             {space.name}
           </span>
-          </span>
           {repoMappings.value[space.id] && (
             <span
               className={styles.mappedIcon}
