@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Activity } from "../types";
 import { julesService } from "../services/jules";
 import { gitService } from "../services/git";
-import { activeSession, repoMappings, selectedSpaceId } from "../state";
+import { activeSession, repoMappings, selectedSpaceId, clearActiveSession } from "../state";
 import styles from "./SessionControls.module.css";
 
 export function SessionControls() {
@@ -24,23 +24,6 @@ export function SessionControls() {
   }, [activeSession.value]);
 
   if (!activeSession.value) return null;
-
-  const handleApprove = async () => {
-    await julesService.approvePlan(activeSession.value!.sessionId);
-  };
-
-  const handleCheckout = async () => {
-    const spaceId = selectedSpaceId.value;
-    const repoPath = spaceId ? repoMappings.value[spaceId] : null;
-    if (repoPath) {
-      await gitService.checkoutBranch(repoPath, "jules-branch");
-      alert("Checked out branch: jules-branch");
-    }
-  };
-
-  const handleArchive = () => {
-    activeSession.value = null;
-  };
 
   return (
     <div className={styles.container}>
@@ -66,13 +49,29 @@ export function SessionControls() {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.approveButton} onClick={handleApprove}>
+        <button
+          className={styles.approveButton}
+          onClick={async () => await julesService.approvePlan(activeSession.value!.sessionId)}
+        >
           Approve Plan
         </button>
-        <button className={styles.checkoutButton} onClick={handleCheckout}>
+        <button
+          className={styles.checkoutButton}
+          onClick={async () => {
+            const spaceId = selectedSpaceId.value;
+            const repoPath = spaceId ? repoMappings.value[spaceId] : null;
+            if (repoPath) {
+              await gitService.checkoutBranch(repoPath, "jules-branch");
+              alert("Checked out branch: jules-branch");
+            }
+          }}
+        >
           Checkout PR Branch
         </button>
-        <button className={styles.archiveButton} onClick={handleArchive}>
+        <button
+          className={styles.archiveButton}
+          onClick={() => clearActiveSession()}
+        >
           Archive Session
         </button>
       </div>

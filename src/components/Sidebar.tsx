@@ -1,12 +1,7 @@
 import { useState } from "preact/hooks";
 import { gitService } from "../services/git";
 import { storeService } from "../services/store";
-import {
-  selectedListId,
-  selectedSpaceId,
-  currentView,
-  repoMappings,
-} from "../state";
+import { selectedListId, repoMappings, mapSpaceToRepo, selectList, selectSpace, navigateTo } from "../state";
 import { useSpaces, useLists } from "../hooks/useClickUp";
 import styles from "./Sidebar.module.css";
 import { Space } from "../types";
@@ -18,30 +13,16 @@ function SpaceItem({ space }: { space: Space }) {
     isCollapsed ? null : space.id,
   );
 
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
-  const handleMapRepo = async (e: Event) => {
-    e.stopPropagation();
-    const repoPath = await gitService.selectRepoDirectory();
-    if (repoPath) {
-      repoMappings.value = { ...repoMappings.value, [space.id]: repoPath };
-      await storeService.setSpaceRepoMappings(repoMappings.value);
-    }
-  };
-
-  const selectList = (listId: string) => {
-    selectedListId.value = listId;
-    selectedSpaceId.value = space.id;
-    currentView.value = "tasks";
-  };
-
   return (
     <div className={styles.spaceItem}>
-      <div className={styles.spaceHeader} onClick={toggleCollapse}>
-        <div
-          style={{ display: "flex", alignItems: "center", overflow: "hidden" }}
-        >
-          <span className={styles.folderIcon}>{isCollapsed ? "📁" : "📂"}</span>
+      <div
+        className={styles.spaceHeader}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+          <span className={styles.folderIcon}>
+            {isCollapsed ? '📁' : '📂'}
+          </span>
           <span className={styles.spaceName} title={space.name}>
             {space.name}
           </span>
@@ -56,7 +37,14 @@ function SpaceItem({ space }: { space: Space }) {
         </div>
         <button
           className={styles.mapButton}
-          onClick={handleMapRepo}
+          onClick={async (e) => {
+            e.stopPropagation();
+            const repoPath = await gitService.selectRepoDirectory();
+            if (repoPath) {
+              mapSpaceToRepo(space.id, repoPath);
+              await storeService.setSpaceRepoMappings({ ...repoMappings.value, [space.id]: repoPath });
+            }
+          }}
           title={repoMappings.value[space.id] || "Map to Git Repo"}
         >
           {repoMappings.value[space.id] ? "Mapped" : "Map"}
@@ -89,8 +77,12 @@ function SpaceItem({ space }: { space: Space }) {
             lists.map((list) => (
               <div
                 key={list.id}
-                className={`${styles.listItem} ${selectedListId.value === list.id ? styles.listItemSelected : ""}`}
-                onClick={() => selectList(list.id)}
+                className={`${styles.listItem} ${selectedListId.value === list.id ? styles.listItemSelected : ''}`}
+                onClick={() => {
+                  selectList(list.id);
+                  selectSpace(space.id);
+                  navigateTo("tasks");
+                }}
               >
                 {list.name}
               </div>
@@ -129,7 +121,7 @@ export function Sidebar() {
       <div className={styles.footer}>
         <button
           className={styles.settingsButton}
-          onClick={() => (currentView.value = "settings")}
+          onClick={() => navigateTo("settings")}
         >
           ⚙️ Settings
         </button>

@@ -1,11 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import {
-  currentView,
-  activeSession,
-  settings,
-  repoMappings,
-  julesSessions,
-} from "./state";
+import { currentView, activeSession, initializeSettings, loadRepoMappings, loadJulesSessions, navigateTo } from "./state";
 import { SettingsView } from "./components/SettingsView";
 import { TasksView } from "./components/TasksView";
 import { SessionControls } from "./components/SessionControls";
@@ -27,19 +21,19 @@ function App() {
       const mappings = await storeService.getSpaceRepoMappings();
       const sessions = await storeService.getActiveJulesSessions();
 
-      settings.value = {
+      initializeSettings({
         clickup_pat: pat || "",
         jules_api_key: apiKey || "",
-      };
-      repoMappings.value = mappings;
-      julesSessions.value = sessions;
+      });
+      loadRepoMappings(mappings);
+      loadJulesSessions(sessions);
 
       if (pat && apiKey) {
-        currentView.value = "welcome";
+        navigateTo("welcome");
         setShowToast(true);
         setTimeout(() => setShowToast(false), 2000);
       } else {
-        currentView.value = "settings";
+        navigateTo("settings");
       }
       setIsInitialized(true);
     };

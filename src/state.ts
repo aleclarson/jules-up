@@ -33,3 +33,61 @@ export const julesSessions = signal<ActiveJulesSessions>({});
 
 // Mappings: spaceId -> repoPath
 export const repoMappings = signal<SpaceRepoMapping>({});
+
+// Mutation functions
+export function navigateTo(view: View) {
+  currentView.value = view;
+}
+
+export function selectSpace(id: string | null) {
+  selectedSpaceId.value = id;
+}
+
+export function selectList(id: string | null) {
+  selectedListId.value = id;
+}
+
+export function initializeSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
+  settings.value = newSettings;
+}
+
+export function saveSettings(newSettings: { clickup_pat: string; jules_api_key: string }) {
+    settings.value = newSettings;
+}
+
+export function clearActiveSession() {
+  activeSession.value = null;
+}
+
+export function startActiveSession(session: JulesSession) {
+  activeSession.value = session;
+}
+
+export function loadJulesSessions(sessions: ActiveJulesSessions) {
+  julesSessions.value = sessions;
+}
+
+export function registerJulesSession(session: JulesSession) {
+  julesSessions.value = { ...julesSessions.value, [session.taskId]: session };
+}
+
+export function loadRepoMappings(mappings: SpaceRepoMapping) {
+  repoMappings.value = mappings;
+}
+
+export function mapSpaceToRepo(spaceId: string, path: string) {
+  repoMappings.value = { ...repoMappings.value, [spaceId]: path };
+}
+
+export function updateSessionPrLink(taskId: string, prUrl: string) {
+  const session = julesSessions.value[taskId];
+  if (session) {
+    const updatedSession = { ...session, prLink: prUrl };
+    julesSessions.value = { ...julesSessions.value, [taskId]: updatedSession };
+
+    // Update activeSession if it matches
+    if (activeSession.value?.sessionId === session.sessionId) {
+      activeSession.value = { ...activeSession.value, prLink: prUrl };
+    }
+  }
+}
