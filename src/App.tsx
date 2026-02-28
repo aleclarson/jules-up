@@ -6,6 +6,8 @@ import { SessionControls } from "./components/SessionControls";
 import { Sidebar } from "./components/Sidebar";
 import { storeService } from "./services/store";
 import { useJulesPoller } from "./hooks/useJulesPoller";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { register } from "@tauri-apps/plugin-global-shortcut";
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -13,6 +15,29 @@ function App() {
 
   // Initialize Jules Poller
   useJulesPoller();
+
+  useEffect(() => {
+    const initWindowListeners = async () => {
+      try {
+        const appWindow = getCurrentWindow();
+
+        // Hide window on blur
+        await appWindow.listen("tauri://blur", () => {
+          appWindow.hide();
+        });
+
+        // Register global shortcut to show the app
+        await register("CommandOrControl+Shift+J", async () => {
+          await appWindow.show();
+          await appWindow.setFocus();
+        });
+      } catch (e) {
+        console.error("Failed to initialize window listeners:", e);
+      }
+    };
+
+    initWindowListeners();
+  }, []);
 
   useEffect(() => {
     const init = async () => {
